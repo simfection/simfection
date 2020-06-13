@@ -36,7 +36,7 @@ class SimfectionSettings:
         'size': 10**5,
         'experiment': False,
         # SimulationRun settings
-        'base_path': 'simfection',
+        'base_path': 'simfection_run',
         'num_days': 15,
         'verbose': False,
         'previous_run': None,
