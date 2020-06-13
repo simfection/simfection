@@ -9,7 +9,7 @@ Simfection is an open-source, stochastic, interactions-based infectious disease 
 
 ## Installing from PyPI
 
-It is recommended that you install `simfection` in a virtual environment. A great place to keep your virtual environments is in a `$HOME/.venv/` directory. If you do not already have such a directory, (1) navigate to your home directory, (2) create it, and (3) enter into the directory.
+It is recommended that you install `simfection` in a virtual environment. A great place to keep your virtual environments is in a `$HOME/.venv/` directory. (The `.` prefix makes the directory [hidden](https://en.wikipedia.org/wiki/Hidden_file_and_hidden_directory).) If you do not already have such a directory, (1) navigate to your home directory, (2) create it, and (3) enter into the directory.
 
 ```shell
 cd $HOME # $HOME may not be a defined variable for you. If not, navigate home.
