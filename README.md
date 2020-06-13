@@ -53,7 +53,7 @@ docker exec simfection bash -c '<COMMANDLINE COMMAND>'
 
 ### Open an Interactive Shell in the `simfection` Docker
 
-To open an interactive shell, issue `docker exec -it simfection`.
+To open an interactive shell, issue `docker exec -it simfection bash`.
 
 When you want to exit the interactive shell, issue `exit`.
 
