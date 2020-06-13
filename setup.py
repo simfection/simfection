@@ -9,7 +9,7 @@ with open("requirements.txt") as f:
 
 setuptools.setup(
     name="simfection",
-    version="0.0.1",
+    version="0.0.2",
     author="Grant Vermillion",
     author_email="grant.cates@gmail.com",
     description="A stochastic, interaction-based infectious disease model",
