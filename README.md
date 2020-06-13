@@ -14,6 +14,7 @@ First, pull the latest version of the docker image. This only needs to run once,
 ```shell
 docker pull simfection/simfection:latest
 ```
+### Run the Docker Container
 
 Next, (1) run the docker container and detach, with (2) a port for the Jupyter notebooks, (3) a directory mount in the current working directory, (4,5) sudo access, (6) the name `simfection`, and (7) the docker image to use with the initial command to start the Jupyter notebook kernel. This also only needs to be run once per image version.
 
@@ -27,8 +28,9 @@ docker run -d \
 simfection/simfection:latest start.sh jupyter notebook --NotebookApp.token=''
 ```
 
-To execute a model run, use the following code. Replace `simfection -h` with any
-command line command.
+### Test the Docker Container 
+
+To test the docker container, use the following code. You should the help output from `simfection`.
 
 ```shell
 docker exec simfection bash -c 'simfection -h'
@@ -48,7 +50,7 @@ To pass a single command-line command `<COMMANDLINE COMMAND>` to the `simfection
 docker exec simfection bash -c '<COMMANDLINE COMMAND>'
 ```
 
-### Open an Interactive Shell in the `simfection` Docker 
+### Open an Interactive Shell in the `simfection` Docker
 
 To open an interactive shell, issue `docker exec -it simfection`.
 
