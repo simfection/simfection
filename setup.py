@@ -4,6 +4,11 @@ import setuptools
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
+requirements = [
+    'pandas==1.0.4',
+    'PyYAML>=5.0.0',
+]
+install_requires = [r.strip() for r in requirements]
 
 setuptools.setup(
     name='simfection',
@@ -15,10 +20,7 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     url='https://github.com/simfection/simfection',
     packages=setuptools.find_packages(),
-    requirements=[
-        'pandas==1.0.4',
-        'PyYAML>=5.0.0',
-    ],
+    install_requires=install_requires,
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
