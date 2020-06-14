@@ -39,6 +39,8 @@ class PopulationEngine:
                 Weights: {}
                 '''.format(total_weights, initial_states)
             )
+        self.initial_states = initial_states
+
         # Synthesize states
         states = np.random.choice(
             [k for k in initial_states.keys()],
@@ -63,10 +65,7 @@ class PopulationEngine:
             }
         )
 
-        inf = population.sample(
-            n=int(num_people*initial_states['inf'])
-        ).agent
-        population.loc[inf, 'state'] = 'inf'
+        population['state'] = self._synthesize_states()
 
         self._df = population
 
