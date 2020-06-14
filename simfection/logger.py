@@ -14,7 +14,7 @@ class SimfectionLogger:
             'formatters': {'console': {'format': '%(asctime)s  %(name)-30s  %(levelname)s  %(message)s'},
                            'file': {'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}},
             'handlers': {'console': {'class': 'logging.StreamHandler',
-                                     'level': 'INFO',
+                                     'level': 'DEBUG',
                                      'formatter': 'console',
                                      'stream': 'ext://sys.stdout'},
                          'file': {'class': 'logging.FileHandler',

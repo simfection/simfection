@@ -55,7 +55,7 @@ class SimulationDay():
         self.connection_engine.create_connections(cpp)
         self.anchor_tracker.end_anchor('connection')
         connection_runtime = self.anchor_tracker.timing('connection')
-        logging.debug(f'- Connections made in {connection_runtime} seconds')
+        logger.debug('- Connections made in {:.2f} seconds'.format(connection_runtime))
 
         self.interaction_engine = InteractionEngine(
             connections=self.connection_engine.connections,
@@ -66,7 +66,7 @@ class SimulationDay():
         self.interaction_engine.interact_all()
         self.anchor_tracker.end_anchor('interact')
         interact_runtime = self.anchor_tracker.timing('interact')
-        logging.debug(f'- Interactions made in {interact_runtime} seconds.')
+        logger.debug('- Interactions made in {:.2f} seconds.'.format(interact_runtime))
 
         self.update_engine = UpdateEngine(
             population=self.interaction_engine.population,
@@ -76,13 +76,13 @@ class SimulationDay():
         self.update_engine.update_all()
         self.anchor_tracker.end_anchor('update')
         update_runtime = self.anchor_tracker.timing('update')
-        logging.debug(f'- Updates made in {update_runtime} seconds.')
+        logger.debug('- Updates made in {:.2f} seconds.'.format(update_runtime))
 
         self.population._df = self.update_engine.population
 
         self.anchor_tracker.end_anchor('run')
         run_runtime = self.anchor_tracker.timing('run')
         logger.debug('- Day ran successfully.')
-        logger.debug(f'- Day simulated in {run_runtime} seconds.')
+        logger.debug('- Day simulated in {:.2f} seconds.'.format(connection_runtime))
         logger.debug('- Saving final population.')
         self.final_population = self.population._df
