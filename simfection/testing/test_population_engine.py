@@ -40,7 +40,7 @@ class TestPopulationEngine(unittest.TestCase):
             percent = initial_states[state]
             num_state = population.query(f'state == "{state}"').index
             percent_state = num_state.size / population_size
-            self.assertAlmostEqual(percent, percent_state, places=2)
+            self.assertAlmostEqual(percent, percent_state, places=1)
 
 if __name__ == '__main__':
     unittest.main()

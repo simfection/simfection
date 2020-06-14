@@ -9,6 +9,7 @@ PyYAML = "*"
 invoke = "*"
 jupyter = "*"
 seaborn = "*"
+nose = "*"
 
 [dev-packages]
 
