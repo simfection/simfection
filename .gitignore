@@ -6,3 +6,7 @@ simfection.egg-info/
 notebooks/issues/simfection.log
 
 notebooks/issues/.ipynb_checkpoints/
+
+simfection/__pycache__/
+
+simfection/testing/__pycache__/
