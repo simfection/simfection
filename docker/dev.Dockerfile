@@ -7,6 +7,7 @@ RUN pip uninstall notebook -y && \
     pip install jupyter_contrib_nbextensions && \
     jupyter contrib nbextension install --user && \
     pip install jupyterthemes && \
+    pip install nose && \ 
     jt -t chesterish -tfs 11 -nfs 115 -cellw 95% -N
 
 RUN git clone https://github.com/simfection/simfection.git && \

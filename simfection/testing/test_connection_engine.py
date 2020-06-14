@@ -1,6 +1,8 @@
 import sys
 sys.path.append('../')
-sys.path.append('../simfection')
+sys.path.append('../../simfection')
+
+print('__file__={0:<35} | __name__={1:<20} | __package__={2:<20}'.format(__file__,__name__,str(__package__)))
 
 import unittest
 import numpy as np
