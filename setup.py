@@ -12,7 +12,7 @@ install_requires = [r.strip() for r in requirements]
 
 setuptools.setup(
     name='simfection',
-    version='0.1.1',
+    version='0.2.0',
     author='Simfection Research Group',
     author_email='simfectiongroup@gmail.com',
     description='A stochastic, interaction-based infectious disease model',
