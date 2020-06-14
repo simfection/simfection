@@ -4,12 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pandas = "*"
-PyYAML = "*"
-invoke = "*"
-jupyter = "*"
-seaborn = "*"
-nose = "*"
+notebook = "==5.7.8"
 
 [dev-packages]
 
