@@ -9,7 +9,7 @@ class SimfectionSettings:
 
     default_settings = {
         # Pathogen settings
-        'infection_rate': 0.4,
+        'infection_rate': 0.04,
         'recovery_rate': 0.1,
         'death_rate': 0.00,
         'spontaneous_rate': 0.0,
