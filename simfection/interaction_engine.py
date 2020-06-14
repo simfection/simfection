@@ -162,7 +162,7 @@ class InteractionEngine():
 
         if verbose:
             logger.debug(
-                '- {}'
+                '- Population states: {}'
                 .format(
                     self
                     .population

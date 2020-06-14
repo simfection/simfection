@@ -91,7 +91,7 @@ class UpdateEngine():
         logger.debug('- Updates complete.')
         if verbose:
             logger.debug(
-                '- {}'
+                '- Population states: {}'
                 .format(
                     self
                     .population

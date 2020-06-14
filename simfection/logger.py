@@ -11,7 +11,7 @@ class SimfectionLogger:
         config = {
             'version': 1,
             'disable_existing_loggers': False,
-            'formatters': {'console': {'format': '%(asctime)s  %(name)-30s  %(levelname)s  %(message)s'},
+            'formatters': {'console': {'format': '%(asctime)s  %(name)-30s  %(levelname)-6s  %(message)s'},
                            'file': {'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}},
             'handlers': {'console': {'class': 'logging.StreamHandler',
                                      'level': 'DEBUG',
