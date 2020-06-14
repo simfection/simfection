@@ -64,10 +64,20 @@ class PopulationEngine:
                 'immunity': [0]*num_people
             }
         )
-
+        logger.debug('- Syntheisizing states.')
         population['state'] = self._synthesize_states()
 
         self._df = population
+        logger.debug(
+            '- {}'
+            .format(
+                self
+                ._df
+                .state
+                .value_counts(normalize=True)
+                .to_dict()
+            )
+        )
 
     def make_dummy(self):
         logger.info('+ Synthesizing a dummy population.')
