@@ -39,6 +39,8 @@ class PopulationEngine:
                 Weights: {}
                 '''.format(total_weights, initial_states)
             )
+        self.initial_states = initial_states
+
         # Synthesize states
         states = np.random.choice(
             [k for k in initial_states.keys()],
