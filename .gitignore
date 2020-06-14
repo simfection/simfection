@@ -2,3 +2,5 @@ build/
 dist/
 
 simfection.egg-info/
+
+notebooks/issues/simfection.log
