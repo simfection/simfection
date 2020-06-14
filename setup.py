@@ -30,7 +30,7 @@ setuptools.setup(
         'console_scripts': [
             'simfection = simfection.simulation_run:main'
         ],
+    },
     test_suite='nose.collector',
     tests_require=['nose'],
-    }
 )
