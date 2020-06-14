@@ -1,5 +1,4 @@
 ARG BASE_CONTAINER=jupyter/datascience-notebook:notebook-6.0.3
-ARG COMMIT
 FROM $BASE_CONTAINER
 
 RUN pip uninstall notebook -y && \
@@ -12,5 +11,5 @@ RUN pip uninstall notebook -y && \
 
 RUN git clone https://github.com/simfection/simfection.git && \
     cd simfection && \
-    git checkout $COMMIT && \
+    git checkout develop && \
     python setup.py install
