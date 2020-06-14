@@ -63,10 +63,7 @@ class PopulationEngine:
             }
         )
 
-        inf = population.sample(
-            n=int(num_people*initial_states['inf'])
-        ).agent
-        population.loc[inf, 'state'] = 'inf'
+        population['state'] = self._synthesize_states()
 
         self._df = population
 
