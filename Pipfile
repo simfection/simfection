@@ -5,8 +5,10 @@ name = "pypi"
 
 [packages]
 pandas = "*"
-pyyaml = "*"
+PyYAML = "*"
 invoke = "*"
+jupyter = "*"
+seaborn = "*"
 
 [dev-packages]
 
