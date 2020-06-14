@@ -5,5 +5,9 @@ docker:
 	simfection/simfection:$(COMMIT) \
 	 --build-arg COMMIT=$(COMMIT)
 
+devdocker:
+	docker build -f dev.Dockerfile . -t \
+	simfection/simfection:$(COMMIT) \
+
 pushdocker:
 	docker push simfection/simfection:$(COMMIT)
