@@ -23,7 +23,7 @@ class ConnectionEngineProfiler:
         if result.ok:
             print("simfection.log succesfully deleted")
         else:
-            print("Unable to delete simfection.log file, please delete manually.")
+            pass
 
 
     def _single_pop_experiment(self):

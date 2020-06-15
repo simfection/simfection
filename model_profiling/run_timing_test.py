@@ -17,7 +17,6 @@ class RunTimingTest:
     def __init__(self, runs=2, pop_range=range(0,1000,100)):
         self.runs = runs
         self.pop_range = pop_range
-        self.pr = cProfile.Profile()
 
     def output_results(self, filename, results_dir='./results/'):
         result = io.StringIO()
@@ -40,6 +39,7 @@ class RunTimingTest:
         for pop_size in self.pop_range:
             # For each population size, run a timing test and output
             # the results to its own specific csv file.
+            self.pr = cProfile.Profile()
             test = ConnectionEngineProfiler(runs=self.runs)
             self.pr.enable()
             test.run_single_pop_test(pop_size)
@@ -61,13 +61,12 @@ timing_test_args = {
     ('-r', '--runs'): {
         'help': (
             'number of runs per population size to help average timing results \n(default: 10)'
-    ),
+        ),
         'type': int,
-        'default': 10,def analysis_function(num=10):
-    x = []
-    for i in range(0, num**5):
-        x.append(i)
-    return x
+        'default': 10,
+        'required': False
+    },
+    ('-pr', '--pop_range'): {
         'help': (
             'population range to run timing tests over, including step size, like: <start>,<stop>,<step_size> \n(default: 100,1000,100)'
         ),

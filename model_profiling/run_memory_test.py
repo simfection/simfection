@@ -32,6 +32,8 @@ class RunMemoryTest:
     def run(self):
         pop_sizes = []
         max_usages = []
+        percent_complete = 0
+        count = 0
         for pop_size in self.pop_range:
             # For each population size, run a memory test and output
             # the results to its own specific csv file.
@@ -48,6 +50,9 @@ class RunMemoryTest:
                     profiler.tearDown()
             pop_sizes.append(pop_size)
             max_usages.append(max_usage)
+            count += 1
+            percent_complete = (count / len(self.pop_range)) * 100
+            print(f'memory test completion percentage: {percent_complete}')
         data = {'pop_sizes': pop_sizes, 
                    'max_usages': max_usages}
         self.results = pd.DataFrame(data)
