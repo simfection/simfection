@@ -10,7 +10,7 @@ import io
 import pandas as pd
 import argparse
 
-from conenction_engine_timing_test import ConnectionEngineTimingTest
+from connection_engine_profiler import ConnectionEngineProfiler
  
 
 class RunTimingTest:
@@ -40,7 +40,7 @@ class RunTimingTest:
         for pop_size in self.pop_range:
             # For each population size, run a timing test and output
             # the results to its own specific csv file.
-            test = ConnectionEngineTimingTest(runs=self.runs)
+            test = ConnectionEngineProfiler(runs=self.runs)
             self.pr.enable()
             test.run_single_pop_test(pop_size)
             self.pr.disable()
@@ -63,10 +63,11 @@ timing_test_args = {
             'number of runs per population size to help average timing results \n(default: 10)'
     ),
         'type': int,
-        'default': 10,
-        'required': False
-    },
-    ('-pr', '--pop_range'): {
+        'default': 10,def analysis_function(num=10):
+    x = []
+    for i in range(0, num**5):
+        x.append(i)
+    return x
         'help': (
             'population range to run timing tests over, including step size, like: <start>,<stop>,<step_size> \n(default: 100,1000,100)'
         ),

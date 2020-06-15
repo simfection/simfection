@@ -28,9 +28,9 @@ for pop_size, filename in sorted(files.items()):
 
     pop_sizes.append(int(pop_size))
     # These are pd.Series, so we'll actually grab the value out of the pd.Series
-    for value in df.query(cc_query)['cumtime']:
+    for value in df.query(cc_query)['cumtime_percall']:
         cc_cumtime.append(value)
-    for value in df.query(make_dummy_query)['cumtime']:
+    for value in df.query(make_dummy_query)['cumtime_percall']:
         make_dummy_cumtime.append(value)
 
 # Exoprt the dataframe with the results to csv:
@@ -39,4 +39,4 @@ data = {'pop_size': pop_sizes,
         'population.make_dummy runtime (s)': make_dummy_cumtime}
 results = pd.DataFrame(data)
 
-results.to_csv('./results.csv')
+results.to_csv('./timing_results.csv')
