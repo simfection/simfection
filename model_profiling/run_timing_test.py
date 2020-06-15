@@ -14,8 +14,7 @@ from connection_engine_profiler import ConnectionEngineProfiler
  
 
 class RunTimingTest:
-    def __init__(self, runs=2, pop_range=range(0,1000,100)):
-        self.runs = runs
+    def __init__(self, pop_range=range(0,1000,100)):
         self.pop_range = pop_range
 
     def output_results(self, filename, results_dir='./results/'):
@@ -36,19 +35,23 @@ class RunTimingTest:
             f.close()
 
     def run(self):
+        count = 0
         for pop_size in self.pop_range:
             # For each population size, run a timing test and output
             # the results to its own specific csv file.
             self.pr = cProfile.Profile()
-            test = ConnectionEngineProfiler(runs=self.runs)
+            profiler = ConnectionEngineProfiler(pop_size=pop_size)
             self.pr.enable()
-            test.run_single_pop_test(pop_size)
+            profiler.run_single_pop_test()
             self.pr.disable()
-            test.tearDown()
+            profiler.tearDown()
 
             # Write out the results to a file
-            filename = "timing_" + "pop_size_" + str(pop_size) + "_runs_" + str(self.runs) + ".csv"
+            filename = "timing_" + "pop_size_" + str(pop_size) + ".csv"
             self.output_results(filename)
+            count += 1
+            percent_complete = (count / len(self.pop_range)) * 100
+            print(f'timing test percent complete: {percent_complete}')
 
 def _get_parser(arguments):
     parser = argparse.ArgumentParser()
@@ -58,14 +61,6 @@ def _get_parser(arguments):
 
 
 timing_test_args = {
-    ('-r', '--runs'): {
-        'help': (
-            'number of runs per population size to help average timing results \n(default: 10)'
-        ),
-        'type': int,
-        'default': 10,
-        'required': False
-    },
     ('-pr', '--pop_range'): {
         'help': (
             'population range to run timing tests over, including step size, like: <start>,<stop>,<step_size> \n(default: 100,1000,100)'
@@ -79,12 +74,11 @@ timing_test_args = {
 def main():
     parser = _get_parser(timing_test_args)
     args = parser.parse_args()
-    runs = args.runs 
     pop_range = args.pop_range
     # convert pop_range list values to integers
     pop_range_list = [int(i) for i in pop_range.split(',')]
     start, stop, step_size = pop_range_list
-    timing_test = RunTimingTest(runs,range(start, stop + step_size, step_size))
+    timing_test = RunTimingTest(range(start, stop + step_size, step_size))
     timing_test.run()
 
 if __name__ == '__main__':

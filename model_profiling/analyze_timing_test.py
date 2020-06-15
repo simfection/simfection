@@ -10,7 +10,7 @@ for (dirpath, dirnames, filenames) in os.walk(filepath):
         this_filepath = dirpath + filename
         name, extension = os.path.splitext(this_filepath)
         if extension == '.csv':
-            pop_size = filename.split('_')[3]
+            pop_size = filename.split('_')[3][:-4]
             files[pop_size] = filename
     break
 
@@ -35,8 +35,8 @@ for pop_size, filename in sorted(files.items()):
 
 # Exoprt the dataframe with the results to csv:
 data = {'pop_size': pop_sizes, 
-        'create_connections runtime (s)': cc_cumtime, 
-        'population.make_dummy runtime (s)': make_dummy_cumtime}
+        'create_connections_runtime_seconds': cc_cumtime, 
+        'population_make_dummy_runtime_seconds': make_dummy_cumtime}
 results = pd.DataFrame(data)
 
 results.to_csv('./timing_results.csv')

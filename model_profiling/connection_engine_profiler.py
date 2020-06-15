@@ -35,5 +35,5 @@ class ConnectionEngineProfiler:
         connectengine = ConnectionEngine(population, self.settings)
         connectengine.create_connections(self.settings.get_setting('cpp'))
 
-    def run_single_pop_test(self, pop_size=1000):
-        self._single_pop_experiment(pop_size)
+    def run_single_pop_test(self):
+        self._single_pop_experiment()
