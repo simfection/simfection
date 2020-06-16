@@ -14,8 +14,9 @@ from connection_engine_profiler import ConnectionEngineProfiler
  
 
 class RunTimingTest:
-    def __init__(self, pop_range=range(0,1000,100)):
+    def __init__(self, pop_range=range(0,1000,100), cpp=False):
         self.pop_range = pop_range
+        self.cpp = cpp
 
     def output_results(self, filename, results_dir='./results/'):
         result = io.StringIO()
@@ -40,7 +41,7 @@ class RunTimingTest:
             # For each population size, run a timing test and output
             # the results to its own specific csv file.
             self.pr = cProfile.Profile()
-            profiler = ConnectionEngineProfiler(pop_size=pop_size)
+            profiler = ConnectionEngineProfiler(pop_size=pop_size, cpp=self.cpp)
             self.pr.enable()
             profiler.run_single_pop_test()
             self.pr.disable()
@@ -69,16 +70,24 @@ timing_test_args = {
         'default': '10,100,10',
         'required': False
     },
+    ('-cpp', '--cpp'): {
+        'help': (
+            'use the cpp optimization, set to true by just indicating flag \n(default: False)'
+        ),
+        'dest': 'cpp',
+        'action': 'store_true'
+    },
 }
 
 def main():
     parser = _get_parser(timing_test_args)
     args = parser.parse_args()
     pop_range = args.pop_range
+    use_cpp = args.cpp
     # convert pop_range list values to integers
     pop_range_list = [int(i) for i in pop_range.split(',')]
     start, stop, step_size = pop_range_list
-    timing_test = RunTimingTest(range(start, stop + step_size, step_size))
+    timing_test = RunTimingTest(range(start, stop + step_size, step_size), use_cpp)
     timing_test.run()
 
 if __name__ == '__main__':
