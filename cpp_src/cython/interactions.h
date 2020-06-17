@@ -12,6 +12,7 @@ class Interactions {
         std::vector<std::vector<int>> infectedByList;
         std::vector<int> daysInfected;
         std::vector<int> immunities;
+        std::unordered_map<int, std::string> agentStates;
 
         public:
         Population();
@@ -26,12 +27,15 @@ class Interactions {
         std::vector<std::vector<int>> getInfectedByList();
         std::vector<int> getDaysInfected();
         std::vector<int> getImmunities();
+        std::unordered_map<int, std::string> getAgentStates();
         // Setters
         void setAgents(std::vector<int> newAgents);
         void setStates(std::vector<std::string> newStates);
         void setInfectedByList(std::vector<std::vector<int>> newInfectedByList);
         void setDaysInfected(std::vector<int> newDaysInfected);
         void setImmunities(std::vector<int> newImmunities);
+        void initAgentStates();
+
     };
 
     class Connections {
@@ -60,26 +64,45 @@ class Interactions {
     };
     // Constructor
     Interactions();
-    // Setter for population
-    void initPopulation(std::vector<int> newAgents,
+    // Setters
+    void setPopulation(std::vector<int> newAgents,
                         std::vector<std::string> newStates,
                         std::vector<std::vector<int>> newInfectedByList,
                         std::vector<int> newDaysInfected,
                         std::vector<int> newImmunities);
-    // Setter for connections
-    void initConnections(std::vector<int> newAgents, 
+    void setConnections(std::vector<int> newAgents, 
                          std::vector<std::vector<int>> newConnectionsList, 
                          std::vector<int> newNumConnections,
                          std::vector<int> newMaxConnections);
+    void setPathogenSettings(std::unordered_map<std::string, float> newPathogenSettings);
     // Getters
     Population getPopulation();
     Connections getConnections();
+    std::unordered_map<std::string, float> getPathogenSettings();
+    std::pair<int, std::string> getAgentIDAndStatePair(int agent_id);
+
+    // Interaction Engine functions
     std::vector<std::vector<int>> getUniqueConnections(Connections thisConnections);
+    std::pair<bool, std::pair<int, int>> qualify_interaction(std::pair<std::pair<int, std::string>, std::pair<int, std::string>> pair);
+    void interact(std::vector<int> pair);
     Population interactAll();
 
     private:
     Population population;
     Connections connections;
+    // unordered_map key, value is: setting_name, setting_value
+    // For pathogen_settings from Python, we should expect default values of 
+    // infection_rate = 0.4
+    // recovery_rate = 0.1
+    // death_rate = 0.00
+    // spontaneous_rate = 0.00
+    // testing_accuracy = None (What is None converted to in C++ via Cython?)
+    //     see: https://stackoverflow.com/questions/54117082/cython-cannot-declare-none-type
+    // immunity_period = 100
+    // contagious_period = 99
+    // incubation_period = 0
+    // We will have to make sure to type cast any potential ints to floats in the .pyx / .pyd file. 
+    std::unordered_map<std::string, float> pathogenSettings;
 
 };
 
