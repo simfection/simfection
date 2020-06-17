@@ -1,3 +1,6 @@
+#ifndef SIMFECTION_CPP_H
+#define SIMFECTION_CPP_H
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -39,7 +42,7 @@ namespace Interactions {
 
         };
 
-        class Connections {
+        class InteractConnections {
             private:
             std::vector<int> agents;
             std::vector<std::vector<int>> connectionsList;
@@ -47,8 +50,8 @@ namespace Interactions {
             std::vector<int> maxConnections;
 
             public:
-            Connections();
-            Connections(std::vector<int> newAgents, 
+            InteractConnections();
+            InteractConnections(std::vector<int> newAgents, 
                         std::vector<std::vector<int>> newConnectionsList, 
                         std::vector<int> newNumConnections,
                         std::vector<int> newMaxConnections);
@@ -78,20 +81,20 @@ namespace Interactions {
         void setPathogenSettings(std::unordered_map<std::string, float> newPathogenSettings);
         // Getters
         Population getPopulation();
-        Connections getConnections();
+        InteractConnections getConnections();
         std::unordered_map<std::string, float> getPathogenSettings();
         std::pair<int, std::string> getAgentIDAndStatePair(int agent_id);
 
         // Interaction Engine functions
         bool isSameString(std::string &str1, std::string &str2);
-        std::vector<std::vector<int>> getUniqueConnections(Connections thisConnections);
+        std::vector<std::vector<int>> getUniqueConnections(InteractConnections thisConnections);
         std::pair<bool, std::pair<int, int>> qualify_interaction(std::pair<std::pair<int, std::string>, std::pair<int, std::string>> pair);
         void interact(std::vector<int> pair);
         void interactAll();
 
         private:
         Population population;
-        Connections connections;
+        InteractConnections connections;
         // Default std::string states, probably better to implement with enums
         std::string inf = "inf";
         std::string sus = "sus";
@@ -114,5 +117,19 @@ namespace Interactions {
 
 }; // end namespace Interactions
 
-
-
+namespace Connections {
+        class Connections {
+        private:
+        int size;
+        public:
+        Connections();
+        Connections(int newSize);
+        int getSize();
+        void setSize(int newSize);
+        bool existsInVector(int num, std::vector<int> &v);
+        std::vector<int> genConnectionsMaxVector(int minConnections, int maxConnections, int size);
+        std::vector<int> getAvailable(int personID, std::vector<int> &connectionsMax, std::vector<std::vector<int> > &connections);
+        std::vector<std::vector<int> > genRandomNetwork(std::vector<int> &connectionsMax, bool verbose=false, bool testing=false);
+    };
+};
+#endif

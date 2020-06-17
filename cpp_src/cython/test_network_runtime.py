@@ -9,7 +9,7 @@ for i in range(1, 100 + 1):
     num = 1000 * i
     sizes.append(num)
 runtimes = []
-def experiment(size):
+def experiment_random_network(size):
     for num in sizes:
         print(f'Running size {num}.')
         # Create a C++ Connections object with a population size of num
@@ -23,7 +23,19 @@ def experiment(size):
         runtime = end - start
         runtimes.append(runtime)
 
-experiment(sizes)
+def experiment_interactions(size):
+    for num in sizes:
+        print(f'Running size {num}.')
+        # Create a C++ Interactions object without anything, just to see if we can
+        # Note that in Python, the actual object is a PyInteractions object
+        start = time.time()
+        x = network.PyInteractions()
+        end = time.time()
+        runtime = end - start
+        runtimes.append(runtime)
+
+# experiment_random_network(sizes)
+experiment_interactions(sizes)
 
 for i in range(len(sizes)):
     size = sizes[i]

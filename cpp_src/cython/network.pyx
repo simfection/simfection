@@ -1,23 +1,20 @@
 # Wrapping the connections list code 
-# distutils: sources = connections.cpp
+# distutils: sources = ./simfection_cpp.cpp
 # distutils: language = c++
 
 from libcpp.vector cimport vector
-from libcpp.map cimport map
-from libcpp.utility cimport pair
 from libcpp cimport bool
+from libcpp.unordered_map cimport unordered_map
+from libcpp.utility cimport pair
 from libcpp.string cimport string
 
-from connections cimport Connections
-from interactions cimport Interactions
-# from interactions cimport Interactions.Population as Population
-ctypedef Interactions.Population Population
-# from interactions cimport Interactions.Connections as interactionsConnections
-ctypedef Interactions.Connections interactionsConnections
+from simfection_cpp cimport Connections, Interactions, Population, InteractConnections
 
 # Create a Cython extension type which holds a C++ instance
 # as an attribute and create a bunch of forwarding methods
 # Python extension type.
+
+# Define API for C++ Connections object
 cdef class PyConnections:
     cdef Connections c_connections  # Hold a C++ instance which we're wrapping
 
@@ -40,13 +37,14 @@ cdef class PyConnections:
         return self.c_connections.genRandomNetwork(connectionsMax, verbose, testing)
 
 
+# Define the API For the C++ Interactions object
 cdef class PyInteractions:
     cdef Interactions c_interactions
 
     # Constructor
     def __cinit__(self):
         # We have an empty construct at the moment
-        pass
+        self.c_interactions = Interactions()
 
     # Setters
     def set_population(self, 
@@ -72,7 +70,7 @@ cdef class PyInteractions:
                                       newMaxConnections)
 
     def set_pathogen_settings(self,
-                              map[string, float] newPathogenSettings):
+                              unordered_map[string, float] newPathogenSettings):
         self.c_interactions.setPathogenSettings(newPathogenSettings)
     
     # Getters

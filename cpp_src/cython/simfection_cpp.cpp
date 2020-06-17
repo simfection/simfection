@@ -6,7 +6,7 @@
 #include <ctime>
 
 // User defined libraries
-#include "interactions.h"
+#include "simfection_cpp.h"
 
 namespace Interactions {
     //-------------------------------------------------------//
@@ -127,11 +127,11 @@ namespace Interactions {
     //-------------------------------------------------------//
     // Define the Connections Class
     //-------------------------------------------------------//
-    Interactions::Connections::Connections(){
+    Interactions::InteractConnections::InteractConnections(){
         // Do nothing
     }
 
-    Interactions::Connections::Connections(std::vector<int> newAgents, 
+    Interactions::InteractConnections::InteractConnections(std::vector<int> newAgents, 
                             std::vector<std::vector<int>> newConnectionsList, 
                             std::vector<int> newNumConnections,
                             std::vector<int> newMaxConnections){
@@ -143,36 +143,36 @@ namespace Interactions {
     }
 
     // Getters
-    std::vector<int> Interactions::Connections::getAgents(){
+    std::vector<int> Interactions::InteractConnections::getAgents(){
         return this->agents;
     }
 
-    std::vector<std::vector<int>> Interactions::Connections::getConnectionsList(){
+    std::vector<std::vector<int>> Interactions::InteractConnections::getConnectionsList(){
         return this->connectionsList;
     }
 
-    std::vector<int> Interactions::Connections::getNumConnections(){
+    std::vector<int> Interactions::InteractConnections::getNumConnections(){
         return this->numConnections;
     }
 
-    std::vector<int> Interactions::Connections::getMaxConnections(){
+    std::vector<int> Interactions::InteractConnections::getMaxConnections(){
         return this->maxConnections;
     }
 
     // Setters
-    void Interactions::Connections::setAgents(std::vector<int> newAgents){
+    void Interactions::InteractConnections::setAgents(std::vector<int> newAgents){
         this->agents = newAgents;
     }
 
-    void Interactions::Connections::setConnectionsList(std::vector<std::vector<int>> newConnectionsList){
+    void Interactions::InteractConnections::setConnectionsList(std::vector<std::vector<int>> newConnectionsList){
         this->connectionsList = newConnectionsList;
     }
 
-    void Interactions::Connections::setNumConnections(std::vector<int> newNumConnections){
+    void Interactions::InteractConnections::setNumConnections(std::vector<int> newNumConnections){
         this->numConnections = newNumConnections;
     }
 
-    void Interactions::Connections::setMaxConnections(std::vector<int> newMaxConnections){
+    void Interactions::InteractConnections::setMaxConnections(std::vector<int> newMaxConnections){
         this->maxConnections = newMaxConnections;
     }
 
@@ -190,7 +190,7 @@ namespace Interactions {
                                 std::vector<std::vector<int>> newConnectionsList, 
                                 std::vector<int> newNumConnections,
                                 std::vector<int> newMaxConnections){
-        this->connections = Connections(newAgents, 
+        this->connections = InteractConnections(newAgents, 
                                         newConnectionsList, 
                                         newNumConnections, 
                                         newMaxConnections);
@@ -215,7 +215,7 @@ namespace Interactions {
     }
 
     // Getters
-    Interactions::Connections Interactions::getConnections(){
+    Interactions::InteractConnections Interactions::getConnections(){
         return this->connections;
     }
 
@@ -239,7 +239,7 @@ namespace Interactions {
         return compare;
     }
 
-    std::vector<std::vector<int>> Interactions::getUniqueConnections(Interactions::Connections thisConnections){
+    std::vector<std::vector<int>> Interactions::getUniqueConnections(Interactions::InteractConnections thisConnections){
         std::vector<std::vector<int>> interaction_pairs;
         // Get connection lists that are > 0 in length/size
         std::vector<std::vector<int>> connectionsList = thisConnections.getConnectionsList();
@@ -391,53 +391,115 @@ namespace Interactions {
 
 } // end namespace Interactions
 
-//-------------------------------------------------------//
-// Main function for debugging and testing
-//-------------------------------------------------------//
-int main(){
-    // Strings to use for agent states
-    std::string inf = "inf";
-    std::string sus = "sus";
-    std::string dead = "dead";
-    // values for connection list stub
-    std::vector<int> newAgents = {0, 1, 2, 3, 4, 5};
-    std::vector<std::vector<int>> newConnectionsList = {{1, 2}, {0, 3}, {0, 3}, {1, 4, 2}, {3, 5}, {4}};
-    std::vector<int> numConnections = {2, 2, 2, 2, 2, 2};
-    std::vector<int> maxConnections = {3, 3, 3, 3, 3, 3};
-
-    // values for population stub
-    std::vector<int> popNewAgents = {0, 1, 2, 3, 4, 5};
-    std::vector<std::string> newStates = {inf, inf, sus, sus, sus, sus};
-    std::vector<std::vector<int>> newInfectedByList = {{}, {}, {}, {}, {}, {}};
-    std::vector<int> newDaysInfected = {1, 1, 0 ,0, 0, 0};
-    std::vector<int> newImmunities = {0, 0, 2, 0, 0, 0};
-
-    // values for pathogenSettings stub
-    std::unordered_map<std::string, float> newPathogenSettings;
-    newPathogenSettings["infection_rate"] = 0.7;
-    newPathogenSettings["recovery_rate"] = 0.1;
-    newPathogenSettings["death_rate"] = 0.00;
-    newPathogenSettings["spontaneous_rate"] = 0.00;
-    newPathogenSettings["testing_accuracy"] = -1.0;
-    newPathogenSettings["immunity_period"] = 100.0;
-    newPathogenSettings["contagious_period"] = 99.0;
-    newPathogenSettings["incubation_period"] = 0.0;
-
-    Interactions::Interactions interactions = Interactions::Interactions();
-    interactions.setConnections(newAgents, newConnectionsList, numConnections, maxConnections);
-    interactions.setPopulation(popNewAgents, newStates, newInfectedByList, newDaysInfected, newImmunities);
-    interactions.setPathogenSettings(newPathogenSettings);
-    interactions.interactAll();
-    Interactions::Interactions::Population population = interactions.getPopulation();
-    
-    std::cout << "infectedByList: " << std::endl;
-    std::vector<std::vector<int>> infectedByList = population.getInfectedByList();
-    for(std::vector<int> v : infectedByList){
-        for(int i : v){
-            std::cout << i << " ";
-        }
-        std::cout << std::endl;
+namespace Connections {
+    Connections::Connections(){
+        // Do nothing
     }
+
+    Connections::Connections(int newSize){
+        setSize(newSize);
+    }
+
+    int Connections::getSize(){
+        return size;
+    }
+
+    void Connections::setSize(int newSize){
+        size = newSize;
+    }
+
+    bool Connections::existsInVector(int num, std::vector<int> &v){
+        for(int i : v){
+            if(num == i){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    std::vector<int> Connections::genConnectionsMaxVector(int minConnections, int maxConnections, int size){
+        std::vector<int> connectionsMax;
+        for(int i = 0; i < size; i++){
+            int connectionRange = maxConnections - minConnections;
+            int randomConnectionSize = std::rand() % connectionRange + minConnections;
+            connectionsMax.push_back(randomConnectionSize);
+        }
+        return connectionsMax;
+    }
+
+    std::vector<int> Connections::getAvailable(int personID, std::vector<int> &connectionsMax, std::vector<std::vector<int> > &connections){
+        // Finds all the connections avialable for a given perosn, excluding themselves. 
+        std::vector<int> available;
+
+        for (int i = 0; i < connections.size(); i++){
+            if (i != personID && !existsInVector(personID, connections[i]) && connections[i].size() < connectionsMax[i]){
+                available.push_back(i);
+            }
+        }
+        return available;
+    }
+
+    std::vector<std::vector<int> > Connections::genRandomNetwork(std::vector<int> &connectionsMax, bool verbose, bool testing){
+        // Instantiate a 2d vector container for the connections list
+        std::vector<std::vector<int> > connections;
+        for(int i = 0; i < size; i++){
+            std::vector<int> v;
+            connections.push_back(v);
+        }
+        // If testing, Generate a random connectionsMax vector
+        if(testing){
+            int connectMin = 8;
+            int connectMax = 10;
+            std::vector<int> connectionsMax = genConnectionsMaxVector(connectMin, connectMax, size);
+        }
+        // Loop through the connections, and for each, allocate a random connection that is available to connect
+        float percent_complete = 0;
+        if (verbose){
+            std::cout << "Starting to generate random network." << std::endl;
+            std::cout << "Percent Complete: " << percent_complete << std::endl;
+        }
+        for (int i = 0; i < size; i++){
+            if (verbose && i % 1000 == 0 ){
+                percent_complete = (float)i / (float)size * 100;
+                std::cout << "Percent Complete: " << percent_complete << std::endl;
+            }
+            
+            while(connections[i].size() < connectionsMax[i]){
+                // Get the available people we can connect with
+                std::vector<int> available = getAvailable(i, connectionsMax, connections);
+                if(available.size() == 0){
+                    // No one available to connect with
+                    break;
+                }
+                // Pick someone from among those we can connect with
+                int randomConnection = std::rand() % available.size();
+
+                // Make sure they aren't already in the person's conenction list
+                for (int j = 0; j < connections[i].size(); j++){
+                    if(randomConnection == connections[i][j]){
+                        // This person is already in the connections list, so continue
+                        continue;
+                    }
+                }
+
+                connections[i].push_back(available[randomConnection]);
+                connections[available[randomConnection]].push_back(i);
+            }
+        }
+
+        return connections;
+    }
+} // end namespace Connections
+
+int main(){
+    std::cout << "Compiled successfully!" << std::endl;
+    // Make a new connections object to test it compiles successfully
+    int newSize = 100;
+    Connections::Connections connections = Connections::Connections(100);
+    std::vector<int> connectionsMax = connections.genConnectionsMaxVector(9, 10, newSize);
+    connections.genRandomNetwork(connectionsMax);
+
+    // Make an interactions object to test it compiles successfully
     
     return 0;
 }
