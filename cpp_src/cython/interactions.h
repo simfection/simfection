@@ -72,8 +72,8 @@ class Interactions {
                          std::vector<int> newNumConnections,
                          std::vector<int> newMaxConnections);
     // Getters
-    Interactions::Population getPopulation();
-    Interactions::Connections getConections();
+    Population getPopulation();
+    Connections getConnections();
     std::vector<std::vector<int>> getUniqueConnections(Connections thisConnections);
     Population interactAll();
 
