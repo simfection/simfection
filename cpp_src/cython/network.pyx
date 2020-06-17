@@ -1,6 +1,7 @@
 # Wrapping the connections list code 
 # distutils: sources = ./simfection_cpp.cpp
 # distutils: language = c++
+import pandas as pd
 
 from libcpp.vector cimport vector
 from libcpp cimport bool
@@ -72,42 +73,23 @@ cdef class PyInteractions:
     def set_pathogen_settings(self,
                               unordered_map[string, float] newPathogenSettings):
         self.c_interactions.setPathogenSettings(newPathogenSettings)
-    
-    # Getters
-    def get_population(self):
-        pass
-    
-    def get_connections(self):
-        pass
-    
-    def get_pathogen_settings(self):
-        pass
-    
-    def get_agent_id_and_state_pair(self, int agent_id):
-        pass
-
-    # Interaction Engine Functions
-    def is_same_string(self, string str1, string str2):
-        pass
-
-    def get_unique_connections(self):
-        if self.get_connections():
-            # Connections is non-empty, call on available connections in object
-            return self.c_interactions.getUniqueConnections(self.c_interactions.getConnections())
-        else:
-            # Connections was empty, so just return None
-            return None
-
-    def qualify_interaction(self, pair[pair[int, string], pair[int, string]] pair):
-        pass
-
-    def interact(self, vector[int] pair):
-        pass
 
     def interact_all(self):
-        pass
+        self.c_interactions.interactAll()
 
     # Function for stitching together a pandas DataFrame to return 
     # for the downstream modules
     def get_population_df(self):
-        pass
+        agents = self.c_interactions.getPopulation().getAgents()
+        states = self.c_interactions.getPopulation().getStates()
+        infectedByList = self.c_interactions.getPopulation().getInfectedByList()
+        daysInfected = self.c_interactions.getPopulation().getDaysInfected()
+        immunities = self.c_interactions.getPopulation().getImmunities()
+        # Package it into a dataframe
+        data = {'agent': agents,
+                'state': states,
+                'infected_by': infectedByList,
+                'days_infected': daysInfected,
+                'immunity': immunities}
+        result = pd.DataFrame(data)
+        return result

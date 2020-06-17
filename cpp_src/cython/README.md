@@ -9,7 +9,7 @@ connections.cpp
 connections.h
 
 The C++ API is exposed in Cython according to the files:
-connections.pxd (Cython header-esque file)
+network.pxd (Cython header-esque file)
 network.pyx 
 setup.py (File for setting up Cython build)
 
