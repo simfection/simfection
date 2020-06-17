@@ -3,6 +3,7 @@
 #include <unordered_map>
 // algorithm allows for using std::rand() and std::unique()
 #include <algorithm>
+#include <ctime>
 
 // User defined libraries
 #include "interactions.h"
@@ -11,7 +12,7 @@
 // Utility functions
 //-------------------------------------------------------//
 
-void print2DVect(std::vector<std::vector<int>> vect){
+void print2DVect(std::vector<std::vector<int>> &vect){
     for(int i = 0; i < vect.size(); i++){
         for(int j = 0; j < vect[i].size(); j++){
             std::cout << vect[i][j] << " ";
@@ -34,6 +35,17 @@ void get2DVectUniqueRows(std::vector<std::vector<int>> &vect){
     vect.resize(std::distance(vect.begin(), it)); 
 }
 
+bool isSameString(std::string &str1, std::string &str2){
+    bool compare;
+    if(str1.compare(str2) != 0){
+        compare = false;
+    }
+    else{
+        compare = true;
+    }
+    return compare;
+}
+
 //-------------------------------------------------------//
 // Define the Population Class
 //-------------------------------------------------------//
@@ -47,7 +59,7 @@ Interactions::Population::Population(std::vector<int> newAgents,
                                      std::vector<int> newDaysInfected,
                                      std::vector<int> newImmunities){
     this->agents = newAgents;
-    this-> states = newStates;
+    this->states = newStates;
     this->infectedByList = newInfectedByList;
     this->daysInfected = newDaysInfected;
     this->immunities = newImmunities;
@@ -169,7 +181,8 @@ void Interactions::Connections::setMaxConnections(std::vector<int> newMaxConnect
 // Define the Interactions Class
 //-------------------------------------------------------//
 Interactions::Interactions(){
-    // Do nothing
+    // Seed the random number generator
+    std::srand((unsigned int)time(NULL));
 }
 
 // Setters
@@ -181,6 +194,8 @@ void Interactions::setConnections(std::vector<int> newAgents,
                                     newConnectionsList, 
                                     newNumConnections, 
                                     newMaxConnections);
+    // Seed the random number generator
+    std::srand((unsigned int)time(NULL));
 }
 
 void Interactions::setPopulation(std::vector<int> newAgents,
@@ -213,6 +228,17 @@ std::unordered_map<std::string, float> Interactions::getPathogenSettings(){
 }
 
 // Interaction Engine functions
+bool Interactions::isSameString(std::string &str1, std::string &str2){
+    bool compare;
+    if(str1.compare(str2) != 0){
+        compare = false;
+    }
+    else{
+        compare = true;
+    }
+    return compare;
+}
+
 std::vector<std::vector<int>> Interactions::getUniqueConnections(Interactions::Connections thisConnections){
     std::vector<std::vector<int>> interaction_pairs;
     // Get connection lists that are > 0 in length/size
@@ -235,8 +261,6 @@ std::vector<std::vector<int>> Interactions::getUniqueConnections(Interactions::C
     }
 
     // Get rid of all duplicate agent_a : agent_b pairs
-    std::cout << "Unsorted interaction_pairs: " << std::endl;
-    print2DVect(interaction_pairs);
     sort2DVectorRows(interaction_pairs);
     get2DVectUniqueRows(interaction_pairs);
 
@@ -246,14 +270,63 @@ std::vector<std::vector<int>> Interactions::getUniqueConnections(Interactions::C
 
 std::pair<bool, std::pair<int, int>> Interactions::qualify_interaction(std::pair<std::pair<int, std::string>, std::pair<int, std::string>> pair){
     // Interact the pair 
+    // interaction_qualification pair denotes
+    // <bool shouldAgentsInteract, <agentAID, agentBID>>
     std::pair<bool, std::pair<int, int>> interaction_qualification;
+    // Fill return variables with default return values
+    interaction_qualification.first = false;
+    std::pair<int, int> infected_susceptible_ids;
+    infected_susceptible_ids.first = -1;
+    infected_susceptible_ids.second = -1;
+    interaction_qualification.second = infected_susceptible_ids;
+    // Unpack the input values for readability
+    int agentAID = pair.first.first;
+    std::string agentAState = pair.first.second;
+    int agentBID = pair.second.first;
+    std::string agentBState = pair.second.second;
+
+    if(agentAState != agentBState){
+        if((isSameString(agentAState, this->inf) || isSameString(agentBState, this->inf)) && (isSameString(agentAState, this->sus) || isSameString(agentBState, this->sus))){
+            // Determine who is infected and who is susceptible
+            int infected_agent;
+            int susceptible_agent;
+            if(isSameString(agentAState, this->inf)){
+                infected_agent = agentAID;
+                susceptible_agent = agentBID;
+            }
+            else{
+                infected_agent = agentBID;
+                susceptible_agent = agentAID;
+            }
+
+            // Determine if the infected agent is contagious
+            // Cast days_infected to int after extracting it
+            float float_contagious_period = this->pathogenSettings["contagious_period"];
+            int contagious_period = static_cast <int> (float_contagious_period);
+            int days_infected = this->population.getDaysInfected()[infected_agent];
+
+            // Determine if susceptible is immune
+            // Get the agent's immunity days remaining
+            int immunity_days_remaining = this->population.getImmunities()[infected_agent];
+            // If the infected person is still contagious and the susceptible person doesn't have immunity
+            // Then infect the susceptible person
+            if(days_infected < contagious_period && immunity_days_remaining == 0){
+                // Set that the two should interact
+                interaction_qualification.first = true;
+                // Set the infected agent's ID
+                infected_susceptible_ids.first = infected_agent;
+                infected_susceptible_ids.second = susceptible_agent;
+                // Set the <infected, susceptible> ID pair in the qualification pair
+                interaction_qualification.second = infected_susceptible_ids;
+            }
+        }
+    }
+
     return interaction_qualification;
 }
 
 void Interactions::interact(std::vector<int> pair){
-    // Load the pathogen settings
-    std::unordered_map<std::string, float> pathogenSettings = this->getPathogenSettings();
-    // Get the agent #s and their states as a couple of pair
+    // Get the agent #s and their states as a couple of pairs
     std::unordered_map<int, std::string> agentStates = this->population.getAgentStates();
     int agentAID = pair[0];
     int agentBID = pair[1];
@@ -268,19 +341,41 @@ void Interactions::interact(std::vector<int> pair){
     std::pair<std::pair<int, std::string>, std::pair<int, std::string>> agentPair;
     agentPair.first = agentAIDState;
     agentPair.second = agentBIDState;
-    // Qualify the interaction
+    // Qualify the interaction and unpack the values
     std::pair<bool, std::pair<int, int>> interaction_qualification = this->qualify_interaction(agentPair);
+    bool qualified_interaction = interaction_qualification.first;
+    int infected_agent_id = interaction_qualification.second.first;
+    int susceptible_agent_id = interaction_qualification.second.second;
     // Draw a random number from 0.0 to 1.0
     float rand_num = static_cast <float> (std::rand()) / static_cast <float> (RAND_MAX);
+    // Get the infection_rate
+    // Load the pathogen settings
+    std::unordered_map<std::string, float> pathogenSettings = this->getPathogenSettings();
+    float infection_rate = pathogenSettings["infection_rate"];
     // Using that random number and the bool from interaction_qualification, 
-    // if interaction_qualification is True and the random number > infection_rate
+    // if interaction_qualification is True and the random number < infection_rate
     // then update the susceptible person's state to 'inf' in the population object and 
     // append to the infected_list of the population object with the infecter's agent #
+    if(qualified_interaction && rand_num < infection_rate){
+        // Update the susceptible agent's (interaction_qualification.second.second) 
+        // state to "inf" in the population agentStates and append the infecting agent's 
+        // ID (interaction_qualification.second.first) to the susceptible agent's infectedByList.
+        std::vector<std::string> newStates = this->population.getStates();
+        // Update the susceptible agent's state
+        newStates[susceptible_agent_id] = "inf";
+        this->population.setStates(newStates);
+        // Append the infecting agent's ID to the suscetible agent's infectedByList
+        std::vector<std::vector<int>> newInfectedByList = this->population.getInfectedByList();
+        newInfectedByList[susceptible_agent_id].push_back(infected_agent_id);
+        this->population.setInfectedByList(newInfectedByList);
+    }
 
 }
 
-Interactions::Population Interactions::interactAll(){
-    Interactions::Population population;
+void Interactions::interactAll(){
+    // The affected object in this function via subcalls is this->population 
+    // which is eventually what we'll want to return in order to fulfill the
+    // same functionality as the python code
     std::vector<std::vector<int>> interaction_pairs;
     // Get all the unique connections
     try {
@@ -292,10 +387,6 @@ Interactions::Population Interactions::interactAll(){
     for(std::vector<int> pair : interaction_pairs){
         this->interact(pair);
     }
-
-    // return an object or set some class variables that have getters defined which can be pulled from 
-    // in the Python code later to reconstruct a population DataFrame. 
-    return population;
 }
 
 
@@ -303,29 +394,49 @@ Interactions::Population Interactions::interactAll(){
 // Main function for debugging and testing
 //-------------------------------------------------------//
 int main(){
+    // Strings to use for agent states
+    std::string inf = "inf";
+    std::string sus = "sus";
+    std::string dead = "dead";
     // values for connection list stub
     std::vector<int> newAgents = {0, 1, 2, 3, 4, 5};
     std::vector<std::vector<int>> newConnectionsList = {{1, 2}, {0, 3}, {0, 3}, {1, 4, 2}, {3, 5}, {4}};
-    std::vector<int> numConnections = {2, 2, 2, 2};
-    std::vector<int> maxConnections = {3, 3, 3, 3};
+    std::vector<int> numConnections = {2, 2, 2, 2, 2, 2};
+    std::vector<int> maxConnections = {3, 3, 3, 3, 3, 3};
 
     // values for population stub
-    std::vector<int> popNewAgents = {0, 1, 2, 3};
-    std::vector<std::string> newStates = {"inf", "sus", "sus", "sus"};
-    std::vector<std::vector<int>> newInfectedByList = {{1}, {}, {}, {}};
-    std::vector<int> newDaysInfected = {1, 0, 0 ,0};
-    std::vector<int> newImmunities = {0, 2, 0, 0};
+    std::vector<int> popNewAgents = {0, 1, 2, 3, 4, 5};
+    std::vector<std::string> newStates = {inf, inf, sus, sus, sus, sus};
+    std::vector<std::vector<int>> newInfectedByList = {{}, {}, {}, {}, {}, {}};
+    std::vector<int> newDaysInfected = {1, 1, 0 ,0, 0, 0};
+    std::vector<int> newImmunities = {0, 0, 2, 0, 0, 0};
 
     // values for pathogenSettings stub
+    std::unordered_map<std::string, float> newPathogenSettings;
+    newPathogenSettings["infection_rate"] = 0.7;
+    newPathogenSettings["recovery_rate"] = 0.1;
+    newPathogenSettings["death_rate"] = 0.00;
+    newPathogenSettings["spontaneous_rate"] = 0.00;
+    newPathogenSettings["testing_accuracy"] = -1.0;
+    newPathogenSettings["immunity_period"] = 100.0;
+    newPathogenSettings["contagious_period"] = 99.0;
+    newPathogenSettings["incubation_period"] = 0.0;
 
     Interactions interactions = Interactions();
     interactions.setConnections(newAgents, newConnectionsList, numConnections, maxConnections);
     interactions.setPopulation(popNewAgents, newStates, newInfectedByList, newDaysInfected, newImmunities);
-    std::cout << "Interactions object successfully made!" << std::endl;
-    std::vector<std::vector<int>> interaction_pairs = interactions.getUniqueConnections(interactions.getConnections());
-    std::cout << "Ordered and non-duplicate interaction_pairs: " << std::endl;
-    print2DVect(interaction_pairs);
+    interactions.setPathogenSettings(newPathogenSettings);
     interactions.interactAll();
+    Interactions::Population population = interactions.getPopulation();
+    
+    std::cout << "infectedByList: " << std::endl;
+    std::vector<std::vector<int>> infectedByList = population.getInfectedByList();
+    for(std::vector<int> v : infectedByList){
+        for(int i : v){
+            std::cout << i << " ";
+        }
+        std::cout << std::endl;
+    }
     
     return 0;
 }

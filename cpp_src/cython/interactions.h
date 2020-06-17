@@ -82,14 +82,19 @@ class Interactions {
     std::pair<int, std::string> getAgentIDAndStatePair(int agent_id);
 
     // Interaction Engine functions
+    bool isSameString(std::string &str1, std::string &str2);
     std::vector<std::vector<int>> getUniqueConnections(Connections thisConnections);
     std::pair<bool, std::pair<int, int>> qualify_interaction(std::pair<std::pair<int, std::string>, std::pair<int, std::string>> pair);
     void interact(std::vector<int> pair);
-    Population interactAll();
+    void interactAll();
 
     private:
     Population population;
     Connections connections;
+    // Default std::string states, probably better to implement with enums
+    std::string inf = "inf";
+    std::string sus = "sus";
+    std::string dead = "dead";
     // unordered_map key, value is: setting_name, setting_value
     // For pathogen_settings from Python, we should expect default values of 
     // infection_rate = 0.4
