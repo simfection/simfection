@@ -51,6 +51,7 @@ cdef extern from "simfection_cpp.h" namespace "Interactions::Interactions::Popul
         void setDaysInfected(vector[int])
         void setImmunities(vector[int] newImmunities)
         void initAgentStates()
+        void genPopulation(int)
 
 
 # Declare the Connections nested/inner class
@@ -78,6 +79,7 @@ cdef extern from "simfection_cpp.h" namespace "Interactions::Interactions::Inter
         void setConnectionsList(vector[vector[int]])
         void setNumConnections(vector[int])
         void setMaxConnections(vector[int])
+        void genInteractConnections(int)
 
 
 # Declare the Interactions class
@@ -86,6 +88,7 @@ cdef extern from "simfection_cpp.h" namespace "Interactions":
         # public: 
         # Constructor
         Interactions() except +
+        Interactions(int) except +
         # Setters
         void setPopulation(vector[int],
                            vector[string],
@@ -102,12 +105,15 @@ cdef extern from "simfection_cpp.h" namespace "Interactions":
         InteractConnections getConnections()
         unordered_map[string, float] getPathogenSettings()
         pair[int, string] getAgentIDAndStatePair(int)
+        # Generator Functions
+        void genPathogenSettings()
         # Interaction Engine Functions
         bool isSameString(string str1, string str2)
         vector[vector[int]] getUniqueConnections(InteractConnections thisConnections)
         pair[bool, pair[int, int]] qualify_interaction(pair[pair[int, string], pair[int, string]])
         void interact(vector[int])
         void interactAll()
+
         # private:
         Population population
         InteractConnections connections

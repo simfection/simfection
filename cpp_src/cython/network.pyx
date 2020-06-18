@@ -1,6 +1,7 @@
 # Wrapping the connections list code 
 # distutils: sources = ./simfection_cpp.cpp
 # distutils: language = c++
+# cython: profile = True
 import pandas as pd
 
 from libcpp.vector cimport vector
@@ -43,9 +44,9 @@ cdef class PyInteractions:
     cdef Interactions c_interactions
 
     # Constructor
-    def __cinit__(self):
+    def __cinit__(self, int size):
         # We have an empty construct at the moment
-        self.c_interactions = Interactions()
+        self.c_interactions = Interactions(size)
 
     # Setters
     def set_population(self, 

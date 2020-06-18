@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <cmath>
 
 namespace Interactions {
     class Interactions {
@@ -28,7 +29,7 @@ namespace Interactions {
             // Getters
             std::vector<int> getAgents();
             std::vector<std::string> getStates();
-            std::vector<std::vector<int>> getInfectedByList();
+            std::vector<std::vector<int>>& getInfectedByList();
             std::vector<int> getDaysInfected();
             std::vector<int> getImmunities();
             std::unordered_map<int, std::string> getAgentStates();
@@ -39,6 +40,8 @@ namespace Interactions {
             void setDaysInfected(std::vector<int> newDaysInfected);
             void setImmunities(std::vector<int> newImmunities);
             void initAgentStates();
+            // Generator functions
+            void genPopulation(int size);
 
         };
 
@@ -65,9 +68,12 @@ namespace Interactions {
             void setConnectionsList(std::vector<std::vector<int>> newConnectionsList);
             void setNumConnections(std::vector<int> newNumConnections);
             void setMaxConnections(std::vector<int> newMaxConnections);
+            // Generator functions
+            void genInteractConnections(int size);
         };
         // Constructor
         Interactions();
+        Interactions(int size);
         // Setters
         void setPopulation(std::vector<int> newAgents,
                             std::vector<std::string> newStates,
@@ -83,13 +89,16 @@ namespace Interactions {
         Population getPopulation();
         InteractConnections getConnections();
         std::unordered_map<std::string, float> getPathogenSettings();
-        std::pair<int, std::string> getAgentIDAndStatePair(int agent_id);
+        std::pair<int, std::string> getAgentIDAndStatePair(int &agent_id);
+
+        // Generator functions
+        void genPathogenSettings();
 
         // Interaction Engine functions
         bool isSameString(std::string &str1, std::string &str2);
-        std::vector<std::vector<int>> getUniqueConnections(InteractConnections thisConnections);
-        std::pair<bool, std::pair<int, int>> qualify_interaction(std::pair<std::pair<int, std::string>, std::pair<int, std::string>> pair);
-        void interact(std::vector<int> pair);
+        std::vector<std::vector<int>> getUniqueConnections(InteractConnections &thisConnections);
+        std::pair<bool, std::pair<int, int>> qualify_interaction(std::pair<std::pair<int, std::string>, std::pair<int, std::string>> &pair);
+        void interact(std::vector<int> &pair);
         void interactAll();
 
         private:

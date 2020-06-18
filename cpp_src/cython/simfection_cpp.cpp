@@ -3,6 +3,7 @@
 #include <unordered_map>
 // algorithm allows for using std::rand() and std::unique()
 #include <algorithm>
+#include <cmath>
 #include <ctime>
 
 // User defined libraries
@@ -76,7 +77,7 @@ namespace Interactions {
         return this->states;
     }
 
-    std::vector<std::vector<int>> Interactions::Population::getInfectedByList(){
+    std::vector<std::vector<int>>& Interactions::Population::getInfectedByList(){
         return this->infectedByList;
     }
 
@@ -121,6 +122,45 @@ namespace Interactions {
         for(int i = 0; i < this->agents.size(); i++){
             agentStates[this->agents[i]] = this->states[i];
         }
+    }
+
+    // Generator Functions
+    void Interactions::Population::genPopulation(int size){
+        float infected_rate = 0.4;
+        std::string inf = "inf";
+        std::string sus = "sus";
+        std::vector<int> agents;
+        std::vector<std::string> states;
+        std::vector<std::vector<int>> infectedByList;
+        std::vector<int> daysInfected;
+        std::vector<int> immunities;
+        // Generate the agents list
+        agents.reserve(size);
+        states.reserve(size);
+        infectedByList.reserve(size);
+        daysInfected.reserve(size);
+        immunities.reserve(size);
+        for(int i = 0; i < size; i++){
+            agents.push_back(i);
+            float rand_num = static_cast <float> (std::rand()) / static_cast <float> (RAND_MAX);
+            if(rand_num < infected_rate){
+                states.push_back(inf);
+                daysInfected.push_back(1);
+            }
+            else{
+                states.push_back(sus);
+                daysInfected.push_back(0);
+            }
+            std::vector<int> empty_list = {};
+            infectedByList.push_back(empty_list);
+            immunities.push_back(0);
+        }
+        // Assign all the values to this object
+        this->agents = agents;
+        this->states = states;
+        this->infectedByList = infectedByList;
+        this->daysInfected = daysInfected;
+        this->immunities = immunities;
     }
 
 
@@ -176,6 +216,37 @@ namespace Interactions {
         this->maxConnections = newMaxConnections;
     }
 
+    // Generator Functions
+    void Interactions::InteractConnections::genInteractConnections(int size){
+        std::vector<int> agents;
+        std::vector<std::vector<int>> connectionsList;
+        std::vector<int> numConnections;
+        std::vector<int> maxConnections;
+        // Preallocate
+        agents.reserve(size);
+        connectionsList.reserve(size);
+        numConnections.reserve(size);
+        maxConnections.reserve(size);
+        for(int i = 0; i < size; i++){
+            agents.push_back(i);
+            // Generate the connections lists
+            int rand_num = std::rand() % 10 + 1;
+            std::vector<int> connections;
+            connections.reserve(rand_num);
+            for(int j = 1; j <= rand_num; j++){
+                int rand_num2 = std::rand() % size;
+                connections.push_back(rand_num2);
+            }
+            numConnections.push_back(rand_num);
+            maxConnections.push_back(rand_num);
+        }
+        // Set the data in this object
+        this->agents = agents;
+        this->connectionsList = connectionsList;
+        this->numConnections = numConnections;
+        this->maxConnections = maxConnections;
+    }
+
 
     //-------------------------------------------------------//
     // Define the Interactions Class
@@ -183,6 +254,16 @@ namespace Interactions {
     Interactions::Interactions(){
         // Seed the random number generator
         std::srand((unsigned int)time(NULL));
+    }
+    Interactions::Interactions(int size){
+        std::cout << "Size of input size: " << sizeof(size) << std::endl;
+        // Seed the random number generator
+        std::srand((unsigned int)time(NULL));
+        // Generate some pathogen settings
+        this->genPathogenSettings();
+        // Generate a random population and connections
+        this->population.genPopulation(size);
+        this->connections.genInteractConnections(size);
     }
 
     // Setters
@@ -227,6 +308,33 @@ namespace Interactions {
         return this->pathogenSettings;
     }
 
+    // Generator Functions
+    void Interactions::genPathogenSettings(){
+        // unordered_map key, value is: setting_name, setting_value
+        // For pathogen_settings from Python, we should expect default values of 
+        float infection_rate = 0.4;
+        float recovery_rate = 0.1;
+        float death_rate = 0.00;
+        float spontaneous_rate = 0.00;
+        float testing_accuracy = 0.0;
+        float immunity_period = 100.0;
+        float contagious_period = 99.0;
+        float incubation_period = 0;
+        // We will have to make sure to type cast any potential ints to floats in the .pyx / .pyd file. 
+        std::unordered_map<std::string, float> pathogenSettings;
+        pathogenSettings["infection_rate"] = infection_rate;
+        pathogenSettings["recovery_rate"] = recovery_rate;
+        pathogenSettings["death_rate"] = death_rate;
+        pathogenSettings["spontaneous_rate"] = spontaneous_rate;
+        pathogenSettings["testing_accuracy"] = testing_accuracy;
+        pathogenSettings["immunity_period"] = immunity_period;
+        pathogenSettings["contagious_period"] = contagious_period;
+        pathogenSettings["incubation_period"] = incubation_period;
+        // Set the data in this object
+        this->pathogenSettings = pathogenSettings;
+
+    }
+
     // Interaction Engine functions
     bool Interactions::isSameString(std::string &str1, std::string &str2){
         bool compare;
@@ -239,14 +347,16 @@ namespace Interactions {
         return compare;
     }
 
-    std::vector<std::vector<int>> Interactions::getUniqueConnections(Interactions::InteractConnections thisConnections){
-        std::vector<std::vector<int>> interaction_pairs;
+    std::vector<std::vector<int>> Interactions::getUniqueConnections(Interactions::InteractConnections &thisConnections){
         // Get connection lists that are > 0 in length/size
         std::vector<std::vector<int>> connectionsList = thisConnections.getConnectionsList();
         std::vector<int> agents = thisConnections.getAgents();
         if(connectionsList.size() != agents.size()){
             throw "agents and connectionsList vectors are not same size!";
         }
+        std::vector<std::vector<int>> interaction_pairs;
+        // Preallocate the vector to be at least as large as the size of agents
+        interaction_pairs.reserve(agents.size());
         // Hold the connections that are > 0 in another 2D vector
         for(int i = 0; i < agents.size(); i++){
             if(connectionsList[i].size() > 0){
@@ -268,7 +378,7 @@ namespace Interactions {
         return interaction_pairs;
     }
 
-    std::pair<bool, std::pair<int, int>> Interactions::qualify_interaction(std::pair<std::pair<int, std::string>, std::pair<int, std::string>> pair){
+    std::pair<bool, std::pair<int, int>> Interactions::qualify_interaction(std::pair<std::pair<int, std::string>, std::pair<int, std::string>> &pair){
         // Interact the pair 
         // interaction_qualification pair denotes
         // <bool shouldAgentsInteract, <agentAID, agentBID>>
@@ -325,7 +435,7 @@ namespace Interactions {
         return interaction_qualification;
     }
 
-    void Interactions::interact(std::vector<int> pair){
+    void Interactions::interact(std::vector<int> &pair){
         // Get the agent #s and their states as a couple of pairs
         std::unordered_map<int, std::string> agentStates = this->population.getAgentStates();
         int agentAID = pair[0];
@@ -365,9 +475,7 @@ namespace Interactions {
             newStates[susceptible_agent_id] = "inf";
             this->population.setStates(newStates);
             // Append the infecting agent's ID to the suscetible agent's infectedByList
-            std::vector<std::vector<int>> newInfectedByList = this->population.getInfectedByList();
-            newInfectedByList[susceptible_agent_id].push_back(infected_agent_id);
-            this->population.setInfectedByList(newInfectedByList);
+            this->population.getInfectedByList()[susceptible_agent_id].push_back(infected_agent_id);
         }
 
     }
@@ -430,6 +538,7 @@ namespace Connections {
     std::vector<int> Connections::getAvailable(int personID, std::vector<int> &connectionsMax, std::vector<std::vector<int> > &connections){
         // Finds all the connections avialable for a given perosn, excluding themselves. 
         std::vector<int> available;
+        available.reserve(connections.size());
 
         for (int i = 0; i < connections.size(); i++){
             if (i != personID && !existsInVector(personID, connections[i]) && connections[i].size() < connectionsMax[i]){
@@ -442,6 +551,7 @@ namespace Connections {
     std::vector<std::vector<int> > Connections::genRandomNetwork(std::vector<int> &connectionsMax, bool verbose, bool testing){
         // Instantiate a 2d vector container for the connections list
         std::vector<std::vector<int> > connections;
+        connections.reserve(size);
         for(int i = 0; i < size; i++){
             std::vector<int> v;
             connections.push_back(v);
@@ -494,12 +604,19 @@ namespace Connections {
 int main(){
     std::cout << "Compiled successfully!" << std::endl;
     // Make a new connections object to test it compiles successfully
-    int newSize = 100;
-    Connections::Connections connections = Connections::Connections(100);
-    std::vector<int> connectionsMax = connections.genConnectionsMaxVector(9, 10, newSize);
-    connections.genRandomNetwork(connectionsMax);
+    // int newSize = 100;
+    // Connections::Connections connections = Connections::Connections(100);
+    // std::vector<int> connectionsMax = connections.genConnectionsMaxVector(9, 10, newSize);
+    // connections.genRandomNetwork(connectionsMax);
 
     // Make an interactions object to test it compiles successfully
+    Interactions::Interactions interactions(std::pow(10, 6));
+    // std::string x;
+    // std::cout << "Interactions object generated. Enter any key to continue to interactAll() function." << std::endl;
+    // std::cin >> x;
+    interactions.interactAll();
+    std::cout << "Successfully ran!" << std::endl;
+
     
     return 0;
 }

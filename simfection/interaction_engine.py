@@ -168,7 +168,8 @@ class InteractionEngine():
 
             # Initialize the network.PyInteractions object
             # For a look at the API, checkout the network.pyx file in /cpp_src/cython
-            interactions = network.PyInteractions()
+            size = self.population['agent'].size
+            interactions = network.PyInteractions(size)
 
             # Get all the population information required for running PyInteractions
             pop_agent = self.population['agent'].tolist()

@@ -23,9 +23,9 @@ for pop_size, filename in sorted(files.items()):
     df = pd.read_csv(filepath + filename, header=0, names=columns)
     function_column = 'function_call'
 
-    create_connections = '../simfection/connection_engine.py:175(create_connections)'
-    interact_all = '../simfection/interaction_engine.py:154(interact_all)'
-    simulation_run = '../simfection/simulation_run.py:46(run)'
+    create_connections = '../simfection/connection_engine.py:174(create_connections)'
+    interact_all = '../simfection/interaction_engine.py:163(interact_all)'
+    simulation_run = '../simfection/simulation_run.py:47(run)'
 
     cc_query = function_column + ' == \'' + create_connections + '\''
     interact_all_query = function_column + ' == \'' + interact_all + '\''
