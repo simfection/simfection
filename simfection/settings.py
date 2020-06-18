@@ -66,3 +66,6 @@ class SimfectionSettings:
             return None
         self.settings[setting] = value
         return value
+
+    def get_settings(self):
+        return self.settings
