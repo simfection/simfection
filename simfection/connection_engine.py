@@ -23,18 +23,17 @@ and randomly creates a hand-shake network of interactions within the population.
     )
     connection_engine.create_connections()
 """
-# import typing #TODO: (Grant) I'm not sure if this is
-# needed for typing.
 import time
 import sys
 import pandas as pd
 import numpy as np
+# User defined imports
 from .settings import SimfectionSettings
 from .logger import SimfectionLogger
 # the network library depends on the
-# network.cpython-37m-darwin.so file being in the same directory
+# compiled network.yourcomputerarchitecture.so file being in the same directory
 try:
-    import network
+    import .network
 except ModuleNotFoundError:
     pass
 

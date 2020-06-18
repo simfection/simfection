@@ -1,8 +1,16 @@
 import pandas as pd
+import numpy as np
+# User defined imports
 from .connection_engine import ConnectionEngine
 from .settings import SimfectionSettings
 from .logger import SimfectionLogger
-import numpy as np
+
+# the network library depends on the
+# compiled network.yourcomputerarchitecture.so file being in the same directory
+try:
+    import .network
+except ModuleNotFoundError:
+    pass
 
 simfection_logger = SimfectionLogger(name=__name__)
 logger = simfection_logger.get_logger()
@@ -20,6 +28,7 @@ class InteractionEngine():
         self.pathogen = {
             key: settings.get_setting(key) for key in settings.get_setting('pathogen_keys')
         }
+        self.settings = settings
 
     def _make_interaction_pair(self, row):
         agent_a = row['agent_a']
@@ -152,25 +161,84 @@ class InteractionEngine():
             )
 
     def interact_all(self):
+        cpp = self.settings.get_setting('cpp')
         verbose = self.verbose
-        logger.debug('- Getting unique interactions.')
-        self._get_unique_connections()
-        connections = self.connections
-        logger.debug('- Running all unique interactions.')
-        for a, b in connections.interaction.values:
-            self._interact(a, b)
+        if cpp:
+            logger.debug('- Running InteractionEngine with C++ optimizations.')
 
-        if verbose:
-            logger.debug(
-                '- Population states: {}'
-                .format(
-                    self
-                    .population
-                    .state
-                    .value_counts(normalize=True)
-                    .to_dict()
+            # Initialize the network.PyInteractions object
+            # For a look at the API, checkout the network.pyx file in /cpp_src/cython
+            interactions = network.PyInteractions()
+
+            # Get all the population information required for running PyInteractions
+            pop_agent = self.population['agent'].tolist()
+            pop_state = self.population['state'].tolist()
+            # Convert every string in pop_state to unicode bytes for ingestion in interactions
+            pop_state = [state.encode() for state in pop_state]
+            pop_infected_by = self.population['infected_by'].tolist()
+            # Do a quick list comprehension to convert any NoneType to empty lists
+            pop_infected_by = [[] if this_list == None else this_list for this_list in pop_infected_by]
+            pop_days_infected = self.population['days_infected'].tolist()
+            pop_immunity = self.population['immunity'].tolist()
+
+            # Set the Population in the PyInteractions object
+            interactions.set_population(pop_agent,
+                                        pop_state,
+                                        pop_infected_by,
+                                        pop_days_infected,
+                                        pop_immunity)
+
+            # Get all the connections information required for running PyInteractions
+            conn_agent = self.connections['agent'].tolist()
+            conn_connections = self.connections['connections'].tolist()
+            conn_num_connections = self.connections['num_connections'].tolist()
+            conn_max_connections = self.connections['max_connections'].tolist()
+
+            # Set the Connections in the PyInteractions object
+            interactions.set_connections(conn_agent,
+                                         conn_connections,
+                                         conn_num_connections,
+                                         conn_max_connections)
+
+            # Set the Pathogen settings, first convert each value in pathogen
+            # to unicode bytes for ingestion to interactions
+            pathogen = {key.encode(): value for key, value in self.pathogen.items()}
+            interactions.set_pathogen_settings(pathogen)
+
+            # Run the Interaction Engine functionality
+            interactions.interact_all()
+            results = interactions.get_population_df()
+            self.population = results
+            if verbose:
+                logger.debug(
+                    '- Population states: {}'
+                    .format(
+                        self
+                        .population
+                        .state
+                        .value_counts(normalize=True)
+                        .to_dict()
+                    )
                 )
-            )
+        else:
+            logger.debug('- Getting unique interactions.')
+            self._get_unique_connections()
+            connections = self.connections
+            logger.debug('- Running all unique interactions.')
+            for a, b in connections.interaction.values:
+                self._interact(a, b)
+
+            if verbose:
+                logger.debug(
+                    '- Population states: {}'
+                    .format(
+                        self
+                        .population
+                        .state
+                        .value_counts(normalize=True)
+                        .to_dict()
+                    )
+                )
 
 
 pathogen = {
@@ -178,7 +246,7 @@ pathogen = {
     'recovery_rate': 0.1,
     'death_rate': 0.02,
     'spontaneous_rate': 0.0,
-    'testing_accuracy': None,
+    'testing_accuracy': 0,
     'immunity_period': 14,
     'contagious_period': 10,
     'incubation_period': 1,
