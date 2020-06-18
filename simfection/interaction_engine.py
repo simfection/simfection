@@ -8,7 +8,7 @@ from .logger import SimfectionLogger
 # the network library depends on the
 # compiled network.yourcomputerarchitecture.so file being in the same directory
 try:
-    import .network
+    import network
 except ModuleNotFoundError:
     pass
 
