@@ -10,12 +10,13 @@ import io
 import pandas as pd
 import argparse
 
-from connection_engine_profiler import ConnectionEngineProfiler
+from module_profiler import ConnectionEngineProfiler, SimulationRunProfiler
  
 
 class RunTimingTest:
-    def __init__(self, pop_range=range(0,1000,100), cpp=False):
+    def __init__(self, module, pop_range=range(0,1000,100), cpp=False):
         self.pop_range = pop_range
+        self.module = module
         self.cpp = cpp
 
     def output_results(self, filename, results_dir='./results/'):
@@ -36,23 +37,42 @@ class RunTimingTest:
             f.close()
 
     def run(self):
-        count = 0
-        for pop_size in self.pop_range:
-            # For each population size, run a timing test and output
-            # the results to its own specific csv file.
-            self.pr = cProfile.Profile()
-            profiler = ConnectionEngineProfiler(pop_size=pop_size, cpp=self.cpp)
-            self.pr.enable()
-            profiler.run_single_pop_test()
-            self.pr.disable()
-            profiler.tearDown()
+        if self.module == 'connection_engine':
+            count = 0
+            for pop_size in self.pop_range:
+                # For each population size, run a timing test and output
+                # the results to its own specific csv file.
+                self.pr = cProfile.Profile()
+                profiler = ConnectionEngineProfiler(pop_size=pop_size, cpp=self.cpp)
+                self.pr.enable()
+                profiler.run_single_pop_test()
+                self.pr.disable()
+                profiler.tearDown()
 
-            # Write out the results to a file
-            filename = "timing_" + "pop_size_" + str(pop_size) + ".csv"
-            self.output_results(filename)
-            count += 1
-            percent_complete = (count / len(self.pop_range)) * 100
-            print(f'timing test percent complete: {percent_complete}')
+                # Write out the results to a file
+                filename = "timing_" + "pop_size_" + str(pop_size) + ".csv"
+                self.output_results(filename)
+                count += 1
+                percent_complete = (count / len(self.pop_range)) * 100
+                print(f'timing test percent complete: {percent_complete}')
+        elif self.module == 'simulation_run':
+            count = 0
+            for pop_size in self.pop_range:
+                # For each population size, run a timing test and output
+                # the results to its own specific csv file.
+                self.pr = cProfile.Profile()
+                profiler = SimulationRunProfiler(pop_size=pop_size, cpp=self.cpp)
+                self.pr.enable()
+                profiler.run_single_pop_test()
+                self.pr.disable()
+                profiler.tearDown()
+
+                # Write out the results to a file
+                filename = "timing_" + "pop_size_" + str(pop_size) + ".csv"
+                self.output_results(filename)
+                count += 1
+                percent_complete = (count / len(self.pop_range)) * 100
+                print(f'timing test percent complete: {percent_complete}')
 
 def _get_parser(arguments):
     parser = argparse.ArgumentParser()
@@ -70,6 +90,14 @@ timing_test_args = {
         'default': '10,100,10',
         'required': False
     },
+    ('-m', '--module'): {
+        'help': (
+            'select which module to run the timing test for \n (options: simulation_run, connection_engine)\n(default: simulation_run)'
+        ),
+        'type': str,
+        'default': 'simulation_run',
+        'required': False
+    },
     ('-cpp', '--cpp'): {
         'help': (
             'use the cpp optimization, set to true by just indicating flag \n(default: False)'
@@ -83,11 +111,12 @@ def main():
     parser = _get_parser(timing_test_args)
     args = parser.parse_args()
     pop_range = args.pop_range
+    module = args.module
     use_cpp = args.cpp
     # convert pop_range list values to integers
     pop_range_list = [int(i) for i in pop_range.split(',')]
     start, stop, step_size = pop_range_list
-    timing_test = RunTimingTest(range(start, stop + step_size, step_size), use_cpp)
+    timing_test = RunTimingTest(module, range(start, stop + step_size, step_size), use_cpp)
     timing_test.run()
 
 if __name__ == '__main__':

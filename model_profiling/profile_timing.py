@@ -5,7 +5,7 @@ from invoke import run
 import pandas as pd
 
 class TimingProfiler:
-    def __init__(self, num_runs=100, columns_to_drop=['population_make_dummy_runtime_seconds', 'Unnamed: 0']):
+    def __init__(self, num_runs=100, columns_to_drop=['create_connections_runtime_seconds', 'interact_all_runtime_seconds', 'Unnamed: 0']):
         self.num_runs = num_runs
         self.columns_to_drop = columns_to_drop
 
@@ -25,7 +25,7 @@ class TimingProfiler:
         for i in range(1, self.num_runs + 1):
             start = time.time()
             # Run a set of timing tests
-            cmd = "python3 run_timing_test.py -pr=10,100,10 -cpp"
+            cmd = "python3 run_timing_test.py -pr=5000,7000,1000 -m=simulation_run"
             result = run(cmd, hide=True, warn=True)
 
             cmd = "python3 analyze_timing_test.py"
@@ -34,17 +34,19 @@ class TimingProfiler:
                 # The file timing_results.csv must exist, so aggregate it into a df to output in a single csv later
                 if i == 1:
                     self.main_df = pd.read_csv('./timing_results.csv')
+                    # Drop unwanted columns
                     for column in self.columns_to_drop:
                         self.main_df = self.main_df.drop(column, axis=1)
                     self.main_df = self.main_df.set_index('pop_size')
                 elif i > 1:
                     aux_df = pd.read_csv('./timing_results.csv')
+                    # Drop unwanted columns
                     for column in self.columns_to_drop:
                         aux_df = aux_df.drop(column, axis=1)
                     rsuffix = '_run_' + str(i)
                     self.main_df = self.main_df.join(aux_df.set_index('pop_size'), rsuffix=rsuffix)
                 # Delete all the results files
-                cmd = "rm ./results/* ./timing_results.csv"
+                cmd = "rm -r ./results/* ./timing_results.csv ./simfection_run"
                 result = run(cmd, hide=True, warn=True)
             else:
                 print("Unable to run analyze_timing_test.py")
