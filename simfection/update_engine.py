@@ -1,12 +1,12 @@
+import pandas as pd
+import numpy as np
+import time
+# User defined imports
 from .connection_engine import ConnectionEngine
 from .interaction_engine import InteractionEngine, pathogen
 from .population_engine import PopulationEngine
 from .settings import SimfectionSettings
 from .logger import SimfectionLogger
-
-import pandas as pd
-import numpy as np
-import time
 
 simfection_logger = SimfectionLogger(name=__name__)
 logger = simfection_logger.get_logger()
@@ -86,11 +86,20 @@ class UpdateEngine():
         self._update_recovered()
         logger.debug('- Updating infected.')
         self._update_infected()
-        logger.debug('- Updating immnue.')
+        logger.debug('- Updating immune.')
         self._update_immune()
         logger.debug('- Updates complete.')
         if verbose:
-            print(self.population.state.value_counts())
+            logger.debug(
+                '- Population states: {}'
+                .format(
+                    self
+                    .population
+                    .state
+                    .value_counts(normalize=True)
+                    .to_dict()
+                )
+            )
 
 
 if __name__ == '__main__':

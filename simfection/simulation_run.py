@@ -1,12 +1,13 @@
+import pickle
+import time
+import os
+# User defined imports
 from .population_engine import PopulationEngine
 from .simulation_day import SimulationDay
 from .settings import SimfectionSettings
 from .logger import SimfectionLogger
 from .path import SimfectionPath
 from .arguments import _get_parser, simfection_args
-import pickle
-import time
-import os
 
 
 simfection_logger = SimfectionLogger(name=__name__)
