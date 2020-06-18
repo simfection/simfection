@@ -54,6 +54,7 @@ cdef class PyInteractions:
                        vector[vector[int]] newInfectedByList,
                        vector[int] newDaysInfected,
                        vector[int] newImmunities):
+        # newInfectedByList can sometimes contain NoneType objects
         self.c_interactions.setPopulation(newAgents, 
                                      newStates,
                                      newInfectedByList,
@@ -81,13 +82,15 @@ cdef class PyInteractions:
     # for the downstream modules
     def get_population_df(self):
         agents = self.c_interactions.getPopulation().getAgents()
-        states = self.c_interactions.getPopulation().getStates()
+        cdef vector[string] states = self.c_interactions.getPopulation().getStates()
+        # Decode the states list from unicode bytes to ASCII str
+        str_states = [state.decode('UTF-8') for state in states]
         infectedByList = self.c_interactions.getPopulation().getInfectedByList()
         daysInfected = self.c_interactions.getPopulation().getDaysInfected()
         immunities = self.c_interactions.getPopulation().getImmunities()
         # Package it into a dataframe
         data = {'agent': agents,
-                'state': states,
+                'state': str_states,
                 'infected_by': infectedByList,
                 'days_infected': daysInfected,
                 'immunity': immunities}

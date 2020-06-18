@@ -1,3 +1,8 @@
+import pandas as pd
+import numpy as np
+import time
+import logging
+# User defined imports
 from .connection_engine import ConnectionEngine
 from .interaction_engine import InteractionEngine, pathogen
 from .population_engine import PopulationEngine
@@ -5,11 +10,6 @@ from .update_engine import UpdateEngine
 from .settings import SimfectionSettings
 from .logger import SimfectionLogger
 from .anchor import AnchorTracker
-
-import pandas as pd
-import numpy as np
-import time
-import logging
 
 
 simfection_logger = SimfectionLogger(name=__name__)

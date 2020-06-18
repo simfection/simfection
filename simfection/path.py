@@ -2,6 +2,7 @@ import os
 import shutil
 import pickle
 import time
+# User defined imports
 from .simulation_day import SimulationDay
 from .logger import SimfectionLogger
 

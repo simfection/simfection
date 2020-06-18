@@ -7,6 +7,7 @@ print('__file__={0:<35} | __name__={1:<20} | __package__={2:<20}'.format(__file_
 import unittest
 import numpy as np
 from invoke import run
+# User defined imports
 from simfection.settings import SimfectionSettings
 from simfection.population_engine import PopulationEngine
 from simfection.connection_engine import ConnectionEngine
