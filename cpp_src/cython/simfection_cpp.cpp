@@ -244,6 +244,10 @@ namespace Interactions {
     }
 
     // Setters
+    void Interactions::setConnections(Interactions::InteractConnections connections){
+        this->connections = connections;
+    }
+
     void Interactions::setConnections(std::vector<int> newAgents, 
                                 std::vector<std::vector<int>> newConnectionsList, 
                                 std::vector<int> newNumConnections,
@@ -252,6 +256,10 @@ namespace Interactions {
                                         newConnectionsList, 
                                         newNumConnections, 
                                         newMaxConnections);
+    }
+
+    void Interactions::setPopulation(Interactions::Population population){
+        this->population = population;
     }
 
     void Interactions::setPopulation(std::vector<int> newAgents,
@@ -266,8 +274,12 @@ namespace Interactions {
                                     newImmunities);
     }
 
-    void Interactions::setPathogenSettings(std::unordered_map<std::string, float> newPathogenSettings){
+    void Interactions::setPathogenSettings(std::unordered_map<std::string, float> &newPathogenSettings){
         this->pathogenSettings = newPathogenSettings;
+    }
+
+    void Interactions::setPathogenSetting(std::string setting, float value){
+        this->pathogenSettings[setting] = value;
     }
 
     // Getters
@@ -571,34 +583,34 @@ namespace Connections {
     }
 } // end namespace Connections
 
-int main(){
-    std::cout << "Compiled successfully!" << std::endl;
-    // Make a new connections object to test it compiles successfully
-    // int newSize = 100;
-    // Connections::Connections connections = Connections::Connections(100);
-    // std::vector<int> connectionsMax = connections.genConnectionsMaxVector(9, 10, newSize);
-    // connections.genRandomNetwork(connectionsMax);
+// int main(){
+//     std::cout << "Compiled successfully!" << std::endl;
+//     // Make a new connections object to test it compiles successfully
+//     // int newSize = 100;
+//     // Connections::Connections connections = Connections::Connections(100);
+//     // std::vector<int> connectionsMax = connections.genConnectionsMaxVector(9, 10, newSize);
+//     // connections.genRandomNetwork(connectionsMax);
 
-    // Make an interactions object to test it compiles successfully
-    Interactions::Interactions interactions(1000);
-    std::cout << "Starting connectionsList: " << std::endl;
-    std::vector<std::vector<int>> connectionsList = interactions.getConnections().getConnectionsList();
-    Interactions::print2DVect(connectionsList);
-    std::vector<std::string> start_states = interactions.getPopulation().getStates();
+//     // Make an interactions object to test it compiles successfully
+//     Interactions::Interactions interactions(1000);
+//     std::cout << "Starting connectionsList: " << std::endl;
+//     std::vector<std::vector<int>> connectionsList = interactions.getConnections().getConnectionsList();
+//     Interactions::print2DVect(connectionsList);
+//     std::vector<std::string> start_states = interactions.getPopulation().getStates();
 
-    interactions.interactAll();
-    std::cout << "Interacted connectionsList: " << std::endl;
-    connectionsList = interactions.getConnections().getConnectionsList();
-    Interactions::print2DVect(connectionsList);
-    std::cout << "Ending states: " << std::endl;
-    std::vector<std::string> end_states = interactions.getPopulation().getStates();
-    for(int i = 0; i < start_states.size(); i++){
-        if(!Interactions::isSameString(start_states[i], end_states[i])){
-            std::cout << start_states[i] << " --> " << end_states[i] << std::endl;
-        }
-    }
-    std::cout << "Successfully ran!" << std::endl;
+//     interactions.interactAll();
+//     std::cout << "Interacted connectionsList: " << std::endl;
+//     connectionsList = interactions.getConnections().getConnectionsList();
+//     Interactions::print2DVect(connectionsList);
+//     std::cout << "Ending states: " << std::endl;
+//     std::vector<std::string> end_states = interactions.getPopulation().getStates();
+//     for(int i = 0; i < start_states.size(); i++){
+//         if(!Interactions::isSameString(start_states[i], end_states[i])){
+//             std::cout << start_states[i] << " --> " << end_states[i] << std::endl;
+//         }
+//     }
+//     std::cout << "Successfully ran!" << std::endl;
 
     
-    return 0;
-}
+//     return 0;
+// }

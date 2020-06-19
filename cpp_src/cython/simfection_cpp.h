@@ -75,16 +75,19 @@ namespace Interactions {
         Interactions();
         Interactions(int size);
         // Setters
+        void setPopulation(Population population);
         void setPopulation(std::vector<int> newAgents,
                             std::vector<std::string> newStates,
                             std::vector<std::vector<int>> newInfectedByList,
                             std::vector<int> newDaysInfected,
                             std::vector<int> newImmunities);
+        void setConnections(InteractConnections connections);
         void setConnections(std::vector<int> newAgents, 
                             std::vector<std::vector<int>> newConnectionsList, 
                             std::vector<int> newNumConnections,
                             std::vector<int> newMaxConnections);
-        void setPathogenSettings(std::unordered_map<std::string, float> newPathogenSettings);
+        void setPathogenSettings(std::unordered_map<std::string, float> &newPathogenSettings);
+        void setPathogenSetting(std::string setting, float value);
         // Getters
         Population getPopulation();
         InteractConnections getConnections();
