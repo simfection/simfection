@@ -89,17 +89,16 @@ class UpdateEngine():
         logger.debug('- Updating immune.')
         self._update_immune()
         logger.debug('- Updates complete.')
-        if verbose:
-            logger.debug(
-                '- Population states: {}'
-                .format(
-                    self
-                    .population
-                    .state
-                    .value_counts(normalize=True)
-                    .to_dict()
-                )
+        logger.debug(
+            '- Population states: {}'
+            .format(
+                self
+                .population
+                .state
+                .value_counts(normalize=True)
+                .to_dict()
             )
+        )
 
 
 if __name__ == '__main__':
