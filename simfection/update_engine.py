@@ -86,11 +86,19 @@ class UpdateEngine():
         self._update_recovered()
         logger.debug('- Updating infected.')
         self._update_infected()
-        logger.debug('- Updating immnue.')
+        logger.debug('- Updating immune.')
         self._update_immune()
         logger.debug('- Updates complete.')
-        if verbose:
-            print(self.population.state.value_counts())
+        logger.debug(
+            '- Population states: {}'
+            .format(
+                self
+                .population
+                .state
+                .value_counts(normalize=True)
+                .to_dict()
+            )
+        )
 
 
 if __name__ == '__main__':
