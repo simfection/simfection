@@ -89,7 +89,6 @@ namespace Interactions {
         Population getPopulation();
         InteractConnections getConnections();
         std::unordered_map<std::string, float> getPathogenSettings();
-        std::pair<int, std::string> getAgentIDAndStatePair(int &agent_id);
 
         // Generator functions
         void genPathogenSettings();
@@ -98,7 +97,7 @@ namespace Interactions {
         bool isSameString(std::string &str1, std::string &str2);
         std::vector<std::vector<int>> getUniqueConnections(InteractConnections &thisConnections);
         std::pair<bool, std::pair<int, int>> qualify_interaction(std::pair<std::pair<int, std::string>, std::pair<int, std::string>> &pair);
-        void interact(std::vector<int> &pair);
+        void interact(std::vector<int> &pair, std::unordered_map<std::string, float>& pathogenSettings);
         void interactAll();
 
         private:

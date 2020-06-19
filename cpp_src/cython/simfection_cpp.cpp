@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <ctime>
+#include <set>
 
 // User defined libraries
 #include "simfection_cpp.h"
@@ -20,20 +21,6 @@ namespace Interactions {
             }
             std::cout << std::endl;
         }
-    }
-
-    void sort2DVectorRows(std::vector<std::vector<int>> &vect){
-        for(int i = 0; i < vect.size(); i++){
-            std::sort(vect[i].begin(), vect[i].end());
-            std::sort(vect.begin(), vect.end());
-        }
-    }
-
-    void get2DVectUniqueRows(std::vector<std::vector<int>> &vect){
-        std::vector<std::vector<int>>::iterator it = std::unique(vect.begin(), vect.end()); 
-    
-        // Resizing the vector which removes undefined items.
-        vect.resize(std::distance(vect.begin(), it)); 
     }
 
     bool isSameString(std::string &str1, std::string &str2){
@@ -126,7 +113,7 @@ namespace Interactions {
 
     // Generator Functions
     void Interactions::Population::genPopulation(int size){
-        float infected_rate = 0.4;
+        float infected_rate = 0.4F;
         std::string inf = "inf";
         std::string sus = "sus";
         std::vector<int> agents;
@@ -135,11 +122,6 @@ namespace Interactions {
         std::vector<int> daysInfected;
         std::vector<int> immunities;
         // Generate the agents list
-        agents.reserve(size);
-        states.reserve(size);
-        infectedByList.reserve(size);
-        daysInfected.reserve(size);
-        immunities.reserve(size);
         for(int i = 0; i < size; i++){
             agents.push_back(i);
             float rand_num = static_cast <float> (std::rand()) / static_cast <float> (RAND_MAX);
@@ -222,21 +204,16 @@ namespace Interactions {
         std::vector<std::vector<int>> connectionsList;
         std::vector<int> numConnections;
         std::vector<int> maxConnections;
-        // Preallocate
-        agents.reserve(size);
-        connectionsList.reserve(size);
-        numConnections.reserve(size);
-        maxConnections.reserve(size);
         for(int i = 0; i < size; i++){
             agents.push_back(i);
-            // Generate the connections lists
+            // Generate the connections lists for each agent
             int rand_num = std::rand() % 10 + 1;
             std::vector<int> connections;
-            connections.reserve(rand_num);
             for(int j = 1; j <= rand_num; j++){
                 int rand_num2 = std::rand() % size;
                 connections.push_back(rand_num2);
             }
+            connectionsList.push_back(connections);
             numConnections.push_back(rand_num);
             maxConnections.push_back(rand_num);
         }
@@ -312,14 +289,14 @@ namespace Interactions {
     void Interactions::genPathogenSettings(){
         // unordered_map key, value is: setting_name, setting_value
         // For pathogen_settings from Python, we should expect default values of 
-        float infection_rate = 0.4;
-        float recovery_rate = 0.1;
-        float death_rate = 0.00;
-        float spontaneous_rate = 0.00;
-        float testing_accuracy = 0.0;
-        float immunity_period = 100.0;
-        float contagious_period = 99.0;
-        float incubation_period = 0;
+        float infection_rate = 0.4F;
+        float recovery_rate = 0.1F;
+        float death_rate = 0.00F;
+        float spontaneous_rate = 0.00F;
+        float testing_accuracy = 0.0F;
+        float immunity_period = 100.0F;
+        float contagious_period = 99.0F;
+        float incubation_period = 0.0F;
         // We will have to make sure to type cast any potential ints to floats in the .pyx / .pyd file. 
         std::unordered_map<std::string, float> pathogenSettings;
         pathogenSettings["infection_rate"] = infection_rate;
@@ -351,12 +328,11 @@ namespace Interactions {
         // Get connection lists that are > 0 in length/size
         std::vector<std::vector<int>> connectionsList = thisConnections.getConnectionsList();
         std::vector<int> agents = thisConnections.getAgents();
-        if(connectionsList.size() != agents.size()){
-            throw "agents and connectionsList vectors are not same size!";
+        std::set<std::vector<int>> interaction_pairs;
+        if (connectionsList.size() != agents.size()) {
+            std::cout << "agents and conenctionsList are not the same size!" << std::endl;
         }
-        std::vector<std::vector<int>> interaction_pairs;
-        // Preallocate the vector to be at least as large as the size of agents
-        interaction_pairs.reserve(agents.size());
+
         // Hold the connections that are > 0 in another 2D vector
         for(int i = 0; i < agents.size(); i++){
             if(connectionsList[i].size() > 0){
@@ -365,17 +341,19 @@ namespace Interactions {
                 for(int connection : connectionsList[agentWithNonZeroConnections]){
                     // Should have the form of {agentWithNonZeroConnections, connection}
                     std::vector<int> pair = {agentWithNonZeroConnections, connection};
-                    interaction_pairs.push_back(pair);
+                    std::sort(pair.begin(), pair.end());
+                    interaction_pairs.insert(pair);
                 }
             }
         }
 
-        // Get rid of all duplicate agent_a : agent_b pairs
-        sort2DVectorRows(interaction_pairs);
-        get2DVectUniqueRows(interaction_pairs);
-
+        // Unpack the set into a 2D vector
+        std::vector<std::vector<int>> vect_interaction_pairs;
+        for (std::vector<int> v : interaction_pairs) {
+            vect_interaction_pairs.push_back(v);
+        }
         // return a 2D vector of the interaction pairs
-        return interaction_pairs;
+        return vect_interaction_pairs;
     }
 
     std::pair<bool, std::pair<int, int>> Interactions::qualify_interaction(std::pair<std::pair<int, std::string>, std::pair<int, std::string>> &pair){
@@ -435,7 +413,7 @@ namespace Interactions {
         return interaction_qualification;
     }
 
-    void Interactions::interact(std::vector<int> &pair){
+    void Interactions::interact(std::vector<int> &pair, std::unordered_map<std::string, float> &pathogenSettings){
         // Get the agent #s and their states as a couple of pairs
         std::unordered_map<int, std::string> agentStates = this->population.getAgentStates();
         int agentAID = pair[0];
@@ -460,7 +438,6 @@ namespace Interactions {
         float rand_num = static_cast <float> (std::rand()) / static_cast <float> (RAND_MAX);
         // Get the infection_rate
         // Load the pathogen settings
-        std::unordered_map<std::string, float> pathogenSettings = this->getPathogenSettings();
         float infection_rate = pathogenSettings["infection_rate"];
         // Using that random number and the bool from interaction_qualification, 
         // if interaction_qualification is True and the random number < infection_rate
@@ -486,14 +463,11 @@ namespace Interactions {
         // same functionality as the python code
         std::vector<std::vector<int>> interaction_pairs;
         // Get all the unique connections
-        try {
-            interaction_pairs = this->getUniqueConnections(this->connections);
-        } catch (const char* msg) {
-            std::cerr << (*msg) << std::endl;
-        }
+        interaction_pairs = this->getUniqueConnections(this->connections);
         // For each connection, interact them
+        std::unordered_map<std::string, float> pathogenSettings = this->getPathogenSettings();
         for(std::vector<int> pair : interaction_pairs){
-            this->interact(pair);
+            this->interact(pair, pathogenSettings);
         }
     }
 
@@ -538,7 +512,6 @@ namespace Connections {
     std::vector<int> Connections::getAvailable(int personID, std::vector<int> &connectionsMax, std::vector<std::vector<int> > &connections){
         // Finds all the connections avialable for a given perosn, excluding themselves. 
         std::vector<int> available;
-        available.reserve(connections.size());
 
         for (int i = 0; i < connections.size(); i++){
             if (i != personID && !existsInVector(personID, connections[i]) && connections[i].size() < connectionsMax[i]){
@@ -551,7 +524,6 @@ namespace Connections {
     std::vector<std::vector<int> > Connections::genRandomNetwork(std::vector<int> &connectionsMax, bool verbose, bool testing){
         // Instantiate a 2d vector container for the connections list
         std::vector<std::vector<int> > connections;
-        connections.reserve(size);
         for(int i = 0; i < size; i++){
             std::vector<int> v;
             connections.push_back(v);
@@ -610,7 +582,8 @@ int main(){
     // connections.genRandomNetwork(connectionsMax);
 
     // Make an interactions object to test it compiles successfully
-    Interactions::Interactions interactions(std::pow(10, 6));
+    Interactions::Interactions interactions(10000);
+    std::cout << interactions.getConnections().getConnectionsList().size() << " vs " << interactions.getConnections().getAgents().size() << std::endl;
     // std::string x;
     // std::cout << "Interactions object generated. Enter any key to continue to interactAll() function." << std::endl;
     // std::cin >> x;
