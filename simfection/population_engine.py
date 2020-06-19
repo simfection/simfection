@@ -64,7 +64,7 @@ class PopulationEngine:
                 'immunity': [0]*num_people
             }
         )
-        logger.debug('- Syntheisizing states.')
+        logger.debug('- Synthesizing states.')
         population['state'] = self._synthesize_states()
 
         self._df = population
