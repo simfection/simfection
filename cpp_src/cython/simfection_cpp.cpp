@@ -582,12 +582,23 @@ int main(){
     // connections.genRandomNetwork(connectionsMax);
 
     // Make an interactions object to test it compiles successfully
-    Interactions::Interactions interactions(10000);
-    std::cout << interactions.getConnections().getConnectionsList().size() << " vs " << interactions.getConnections().getAgents().size() << std::endl;
-    // std::string x;
-    // std::cout << "Interactions object generated. Enter any key to continue to interactAll() function." << std::endl;
-    // std::cin >> x;
+    Interactions::Interactions interactions(1000);
+    std::cout << "Starting connectionsList: " << std::endl;
+    std::vector<std::vector<int>> connectionsList = interactions.getConnections().getConnectionsList();
+    Interactions::print2DVect(connectionsList);
+    std::vector<std::string> start_states = interactions.getPopulation().getStates();
+
     interactions.interactAll();
+    std::cout << "Interacted connectionsList: " << std::endl;
+    connectionsList = interactions.getConnections().getConnectionsList();
+    Interactions::print2DVect(connectionsList);
+    std::cout << "Ending states: " << std::endl;
+    std::vector<std::string> end_states = interactions.getPopulation().getStates();
+    for(int i = 0; i < start_states.size(); i++){
+        if(!Interactions::isSameString(start_states[i], end_states[i])){
+            std::cout << start_states[i] << " --> " << end_states[i] << std::endl;
+        }
+    }
     std::cout << "Successfully ran!" << std::endl;
 
     

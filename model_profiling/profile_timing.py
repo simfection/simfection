@@ -25,7 +25,7 @@ class TimingProfiler:
         for i in range(1, self.num_runs + 1):
             start = time.time()
             # Run a set of timing tests
-            cmd = "python3 run_timing_test.py -pr=1000,2000,1000 -m=simulation_run -cpp"
+            cmd = "python3 run_timing_test.py -pr=100,900,100 -m=simulation_run -cpp"
             result = run(cmd, hide=True, warn=True)
 
             cmd = "python3 analyze_timing_test.py"
