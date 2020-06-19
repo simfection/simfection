@@ -127,15 +127,14 @@ class PopulationEngine:
             )
         )
 
-        if verbose:
-            logger.debug(
-                '- Population states: {}'
-                .format(
-                    population
-                    .state
-                    .value_counts(normalize=True)
-                    .to_dict()
-                )
+        logger.debug(
+            '- Population states: {}'
+            .format(
+                population
+                .state
+                .value_counts(normalize=True)
+                .to_dict()
             )
+        )
 
         self._df = population

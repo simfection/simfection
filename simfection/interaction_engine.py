@@ -160,17 +160,16 @@ class InteractionEngine():
         for a, b in connections.interaction.values:
             self._interact(a, b)
 
-        if verbose:
-            logger.debug(
-                '- Population states: {}'
-                .format(
-                    self
-                    .population
-                    .state
-                    .value_counts(normalize=True)
-                    .to_dict()
-                )
+        logger.debug(
+            '- Population states: {}'
+            .format(
+                self
+                .population
+                .state
+                .value_counts(normalize=True)
+                .to_dict()
             )
+        )
 
 
 pathogen = {
