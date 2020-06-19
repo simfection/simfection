@@ -55,7 +55,7 @@ class SimulationDay():
         self.connection_engine.create_connections(cpp)
         self.anchor_tracker.end_anchor('connection')
         connection_runtime = self.anchor_tracker.timing('connection')
-        logger.debug('- Connections made in {:.2f} seconds'.format(connection_runtime))
+        logger.debug('- Connections made in {:.2f} seconds.'.format(connection_runtime))
 
         self.interaction_engine = InteractionEngine(
             connections=self.connection_engine.connections,
