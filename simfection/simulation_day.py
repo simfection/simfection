@@ -38,6 +38,16 @@ class SimulationDay():
 
         else:
             logger.debug('+ Population loaded.')
+            logger.debug(
+                '- Population states: {}'
+                .format(
+                    self
+                    ._df
+                    .state
+                    .value_counts(normalize=True)
+                    .to_dict()
+                )
+            )
             self.population = population
 
         logger.debug('+ Saving starting population.')
