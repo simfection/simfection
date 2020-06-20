@@ -195,45 +195,23 @@ class InteractionEngine():
 
     def interact_all(self):
         verbose = self.verbose
-        if self.cpp:
-            logger.debug('- Running InteractionEngine with C++ optimizations.')
+        logger.debug('- Getting unique interactions.')
+        self._get_unique_connections()
+        connections = self.connections
+        logger.debug('- Running all unique interactions.')
+        for a, b in connections.interaction.values:
+            self._interact(a, b)
 
-            self._init_interactions()
-
-            # Run the Interaction Engine functionality
-            self.interactions.interact_all()
-            results = self.interactions.get_population_df()
-            self.population = results
-            if verbose:
-                logger.debug(
-                    '- Population states: {}'
-                    .format(
-                        self
-                        .population
-                        .state
-                        .value_counts(normalize=True)
-                        .to_dict()
-                    )
-                )
-        else:
-            logger.debug('- Getting unique interactions.')
-            self._get_unique_connections()
-            connections = self.connections
-            logger.debug('- Running all unique interactions.')
-            for a, b in connections.interaction.values:
-                self._interact(a, b)
-
-            if verbose:
-                logger.debug(
-                    '- Population states: {}'
-                    .format(
-                        self
-                        .population
-                        .state
-                        .value_counts(normalize=True)
-                        .to_dict()
-                    )
-                )
+        logger.debug(
+            '- Population states: {}'
+            .format(
+                self
+                .population
+                .state
+                .value_counts(normalize=True)
+                .to_dict()
+            )
+        )
 
 
 pathogen = {
