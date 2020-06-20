@@ -72,7 +72,14 @@ cdef class PyInteractions:
                                       newMaxConnections)
 
     def set_pathogen_settings(self,
-                              unordered_map[string, float] newPathogenSettings):
+                              pathogenSettings):
+        # Go through all the values in the pathogen settings dict and make sure any
+        # that are None are set to -1. 
+        for key, value in pathogenSettings.items():
+            if value is None: 
+                pathogenSettings[key] = -1.0
+
+        cdef unordered_map[string, float] newPathogenSettings = pathogenSettings
         self.c_interactions.setPathogenSettings(newPathogenSettings)
 
     def interact_all(self):

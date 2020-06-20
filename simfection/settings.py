@@ -14,7 +14,7 @@ class SimfectionSettings:
         'recovery_rate': 0.1,
         'death_rate': 0.00,
         'spontaneous_rate': 0.0,
-        'testing_accuracy': 0,
+        'testing_accuracy': None,
         'immunity_period': 10**2,
         'contagious_period': 99,
         'incubation_period': 0,
