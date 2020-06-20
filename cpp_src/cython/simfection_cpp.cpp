@@ -112,8 +112,7 @@ namespace Interactions {
     }
 
     // Generator Functions
-    void Interactions::Population::genPopulation(int size){
-        float infected_rate = 0.4F;
+    void Interactions::Population::genPopulation(int size, float infection_rate){
         std::string inf = "inf";
         std::string sus = "sus";
         std::vector<int> agents;
@@ -125,7 +124,7 @@ namespace Interactions {
         for(int i = 0; i < size; i++){
             agents.push_back(i);
             float rand_num = static_cast <float> (std::rand()) / static_cast <float> (RAND_MAX);
-            if(rand_num < infected_rate){
+            if(rand_num < infection_rate){
                 states.push_back(inf);
                 daysInfected.push_back(1);
             }
@@ -238,8 +237,9 @@ namespace Interactions {
         std::srand((unsigned int)time(NULL));
         // Generate some pathogen settings
         this->genPathogenSettings();
+        float infection_rate = this->pathogenSettings["infection_rate"];
         // Generate a random population and connections
-        this->population.genPopulation(size);
+        this->population.genPopulation(size, infection_rate);
         this->connections.genInteractConnections(size);
     }
 
@@ -252,8 +252,6 @@ namespace Interactions {
                                         newConnectionsList, 
                                         newNumConnections, 
                                         newMaxConnections);
-        // Seed the random number generator
-        std::srand((unsigned int)time(NULL));
     }
 
     void Interactions::setPopulation(std::vector<int> newAgents,
@@ -289,7 +287,7 @@ namespace Interactions {
     void Interactions::genPathogenSettings(){
         // unordered_map key, value is: setting_name, setting_value
         // For pathogen_settings from Python, we should expect default values of 
-        float infection_rate = 0.4F;
+        float infection_rate = 0.5F;
         float recovery_rate = 0.1F;
         float death_rate = 0.00F;
         float spontaneous_rate = 0.00F;

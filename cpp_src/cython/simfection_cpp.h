@@ -41,7 +41,7 @@ namespace Interactions {
             void setImmunities(std::vector<int> newImmunities);
             void initAgentStates();
             // Generator functions
-            void genPopulation(int size);
+            void genPopulation(int size, float infection_rate);
 
         };
 
