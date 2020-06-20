@@ -50,8 +50,19 @@ class TestConnectionEngine(unittest.TestCase):
     def test_no_repeat_connections(self):
         # A connection list shouldn't have repeat connections
         for connection_list in self.connections['connections']:
-            for element in connection_list:
-                self.assertLess(connection_list.count(element), 2)
+            for agent in connection_list:
+                self.assertLess(connection_list.count(agent), 2)
+
+    def test_connections_are_undirected_graph(self):
+        # If two agents are connected, they should both be in the other's 
+        # connection list
+        for agent, connection_list in enumerate(self.connections['connections']):
+            for other_agent in connection_list:
+                agent_in_other_connections_list = False
+                if agent in self.connections['connections'][other_agent]:
+                    agent_in_other_connections_list = True
+            self.assertTrue(agent_in_other_conenctions_list)
+
 
 if __name__ == '__main__':
     unittest.main()

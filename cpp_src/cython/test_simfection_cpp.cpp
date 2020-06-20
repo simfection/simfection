@@ -13,7 +13,7 @@
 #include "simfection_cpp.cpp"
 
 
-Interactions::Interactions setup() {
+Interactions::Interactions setupInteractions() {
 	// Create the populations stub
 	std::string sus = "sus";
 	std::string inf = "inf";
@@ -39,10 +39,18 @@ Interactions::Interactions setup() {
 	return interactions;
 }
 
+std::vector<std::vector<int>> setupConnections(){
+	int newSize = 100;
+    Connections::Connections connections = Connections::Connections(newSize);
+    std::vector<int> connectionsMax = connections.genConnectionsMaxVector(9, 10, newSize);
+    std::vector<std::vector<int>> connectionsList = connections.genRandomNetwork(connectionsMax);
+	return connectionsList;
+}
+
 // Test the qualify interaction function
 // if infection_rate is 1.0
 TEST(TestQualifyInteractionFunction, TestSimfectionCpp) {
-	Interactions::Interactions interactions = setup();
+	Interactions::Interactions interactions = setupInteractions();
 
 	std::vector<std::vector<int>> interaction_pairs;
     // Get all the unique connections
@@ -75,7 +83,7 @@ TEST(TestQualifyInteractionFunction, TestSimfectionCpp) {
 // Test that an infected person will infect a susceptible person 
 // if infection_rate is 1.0
 TEST(TestInteractFunction, TestSimfectionCpp) {
-	Interactions::Interactions interactions = setup();
+	Interactions::Interactions interactions = setupInteractions();
 	std::vector<std::vector<int>> interaction_pairs;
     // Get all the unique connections
 	Interactions::Interactions::InteractConnections connections = interactions.getConnections();
@@ -92,13 +100,50 @@ TEST(TestInteractFunction, TestSimfectionCpp) {
 
 // Test that, if the infected rate is high enough,
 // sus people are converted to infected
-TEST(TestSusGetInfected, TestSimfectionCpp) {
-	Interactions::Interactions interactions = setup();
-	std::vector<std::string> start_states = interactions.getPopulation().getStates();
-	interactions.interactAll();
-	std::vector<std::string> end_states = interactions.getPopulation().getStates();
-	EXPECT_EQ(1, 1);
-	EXPECT_TRUE(true);
+// TEST(TestSusGetInfected, TestSimfectionCpp) {
+// 	Interactions::Interactions interactions = setupInteractions();
+// 	std::vector<std::string> start_states = interactions.getPopulation().getStates();
+// 	interactions.interactAll();
+// 	std::vector<std::string> end_states = interactions.getPopulation().getStates();
+// 	EXPECT_EQ(1, 1);
+// 	EXPECT_TRUE(true);
+// }
+
+TEST(TestConnectionsListIsUndirectedGraph, TestSimfectionCpp){
+	std::vector<std::vector<int>> connectionsList = setupConnections();
+	// If two agents are connected, they should both be in the other's 
+	// connection list
+
+	// Print out the connectionsList for debugging: 
+	Interactions::print2DVect(connectionsList);
+	for(int agent = 0; agent < connectionsList.size(); agent++){
+		bool print_agents = false;
+		std::vector<int> agentConnectionsList = connectionsList[agent];
+
+		for(int j = 0; j < agentConnectionsList.size(); j++){
+			int otherAgent = agentConnectionsList[j];
+			bool agentInOtherAgentConnectionsList = false;
+			if(print_agents){
+				std::cout << "Agent: " << agent << std::endl;
+				std::cout << "Other Agent: " << otherAgent << std::endl;
+				print_agents = false;
+			}
+			// Search for the agent in the other agent's connection list
+			std::vector<int> otherAgentConnectionsList = connectionsList[otherAgent];
+			std::vector<int>::iterator it = std::find(otherAgentConnectionsList.begin(), 
+													  otherAgentConnectionsList.end(), 
+													  agent);
+			if(it != otherAgentConnectionsList.end()){
+				agentInOtherAgentConnectionsList = true;
+			}
+			// We should have found agent in the otherAgent's connectionsList
+			if(agent != otherAgent){
+				EXPECT_TRUE(agentInOtherAgentConnectionsList);
+			}
+		}
+	}
+
+
 }
 
 int main(int argc, char** argv) {

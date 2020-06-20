@@ -16,6 +16,7 @@ namespace Interactions {
     //-------------------------------------------------------//
     void print2DVect(std::vector<std::vector<int>> &vect){
         for(int i = 0; i < vect.size(); i++){
+            std::cout << "Agent " << i << ": ";
             for(int j = 0; j < vect[i].size(); j++){
                 std::cout << vect[i][j] << " ";
             }
