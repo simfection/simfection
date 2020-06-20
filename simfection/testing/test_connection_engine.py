@@ -16,16 +16,20 @@ class TestConnectionEngine(unittest.TestCase):
 
     def setUp(self):
         self.settings = SimfectionSettings()
+        self.settings.set_setting('cpp', True)
         self.population = PopulationEngine(self.settings)
         self.population.synthesize_population()
         # Seed the numpy random number generator so results are repeatable
         np.random.seed(0)
+
+        # Create the ConnectionEngine
         self.connection_engine = ConnectionEngine(
-        population=self.population._df,
+            population=self.population._df,
             settings=self.settings
         )
         self.connection_engine.create_connections()
         self.connections = self.connection_engine.connections
+
         super(TestConnectionEngine, self).setUp()
 
     def tearDown(self):
@@ -52,6 +56,16 @@ class TestConnectionEngine(unittest.TestCase):
         for connection_list in self.connections['connections']:
             for element in connection_list:
                 self.assertLess(connection_list.count(element), 2)
+
+    def test_connections_are_undirected(self):
+        # For every connection in the connection list of an agent, that
+        # agent should be a connection in the connection list of that other agent
+        for agent, connection_list in enumerate(self.connections['connections']):
+            for connection in connection_list:
+                agent_in_connections_list = False
+                if agent in self.connections['connections'][connection]:
+                    agent_in_connections_list = True
+                self.assertTrue(agent_in_connections_list)
 
 if __name__ == '__main__':
     unittest.main()

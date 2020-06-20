@@ -5,13 +5,6 @@ from .connection_engine import ConnectionEngine
 from .settings import SimfectionSettings
 from .logger import SimfectionLogger
 
-# the network library depends on the
-# compiled network.yourcomputerarchitecture.so file being in the same directory
-try:
-    import network
-except ModuleNotFoundError:
-    pass
-
 simfection_logger = SimfectionLogger(name=__name__)
 logger = simfection_logger.get_logger()
 

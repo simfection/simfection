@@ -4,12 +4,13 @@ import time
 import logging
 # User defined imports
 from .connection_engine import ConnectionEngine
-from .interaction_engine import InteractionEngine, pathogen
+from .connection_engine_cpp import ConnectionEngineCpp
+from .interaction_engine import InteractionEngine
+from .interaction_engine_cpp import InteractionEngineCpp
 from .population_engine import PopulationEngine
 from .update_engine import UpdateEngine
 from .settings import SimfectionSettings
 from .logger import SimfectionLogger
-from .anchor import AnchorTracker
 
 
 simfection_logger = SimfectionLogger(name=__name__)
@@ -23,7 +24,7 @@ class SimulationDay():
             day_number: int = None,
             population: PopulationEngine = None,
             settings: SimfectionSettings = None) -> None:
-        self.anchor_tracker = AnchorTracker()
+        self.cpp = settings.get_setting('cpp')
         assert population is not None or settings is not None, (
             'Both population and settings are NoneType. At least one must be passed.'
         )
@@ -44,45 +45,56 @@ class SimulationDay():
         self.starting_population = self.population._df.copy()
 
     def run(self):
-        self.anchor_tracker.create_anchor('run')
         verbose = self.settings.get_setting('verbose')
-        self.connection_engine = ConnectionEngine(
-            population=self.population._df,
-            settings=self.settings
-        )
-        self.anchor_tracker.create_anchor('connection')
-        cpp = self.settings.get_setting('cpp')
-        self.connection_engine.create_connections(cpp)
-        self.anchor_tracker.end_anchor('connection')
-        connection_runtime = self.anchor_tracker.timing('connection')
-        logger.debug('- Connections made in {:.2f} seconds'.format(connection_runtime))
+        if not self.cpp:
+            self.connection_engine = ConnectionEngine(
+                population=self.population._df,
+                settings=self.settings
+            )
+            self.connection_engine.create_connections()
 
-        self.interaction_engine = InteractionEngine(
-            connections=self.connection_engine.connections,
-            settings=self.settings,
-            population=self.connection_engine.population
-        )
-        self.anchor_tracker.create_anchor('interact')
-        self.interaction_engine.interact_all()
-        self.anchor_tracker.end_anchor('interact')
-        interact_runtime = self.anchor_tracker.timing('interact')
-        logger.debug('- Interactions made in {:.2f} seconds.'.format(interact_runtime))
+            self.interaction_engine = InteractionEngineCpp(
+                connections=self.connection_engine.connections,
+                settings=self.settings,
+                population=self.connection_engine.population
+            )
 
-        self.update_engine = UpdateEngine(
-            population=self.interaction_engine.population,
-            settings=self.settings
-        )
-        self.anchor_tracker.create_anchor('update')
-        self.update_engine.update_all()
-        self.anchor_tracker.end_anchor('update')
-        update_runtime = self.anchor_tracker.timing('update')
-        logger.debug('- Updates made in {:.2f} seconds.'.format(update_runtime))
+            self.interaction_engine = InteractionEngine(
+                connections=self.connection_engine.connections,
+                settings=self.settings,
+                population=self.connection_engine.population
+            )
+            
+            self.interaction_engine.interact_all()
 
-        self.population._df = self.update_engine.population
+            self.update_engine = UpdateEngine(
+                population=self.interaction_engine.population,
+                settings=self.settings
+            )
+            self.update_engine.update_all()
 
-        self.anchor_tracker.end_anchor('run')
-        run_runtime = self.anchor_tracker.timing('run')
+            self.population._df = self.update_engine.population
+        else:
+            self.connection_engine = ConnectionEngineCpp(
+                population=self.population._df,
+                settings=self.settings
+            )
+            self.connection_engine.create_connections()
+
+            self.interaction_engine = InteractionEngineCpp(
+                connections=self.connection_engine.connections,
+                settings=self.settings,
+                population=self.connection_engine.population
+            )
+
+            self.update_engine = UpdateEngine(
+                population=self.interaction_engine.population,
+                settings=self.settings
+            )
+            self.update_engine.update_all()
+
+            self.population._df = self.update_engine.population
+
         logger.debug('- Day ran successfully.')
-        logger.debug('- Day simulated in {:.2f} seconds.'.format(connection_runtime))
         logger.debug('- Saving final population.')
         self.final_population = self.population._df
