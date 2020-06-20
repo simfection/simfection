@@ -10,3 +10,17 @@ notebooks/issues/.ipynb_checkpoints/
 simfection/__pycache__/
 
 simfection/testing/__pycache__/
+
+./simfection.sln
+
+./simfection.vcxproj
+
+./simfection.vcxproj.filters
+
+./simfection.vcxproj.user
+
+./.vs/
+
+./Debug/
+
+./CppProperties.json
