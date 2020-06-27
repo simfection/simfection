@@ -62,48 +62,30 @@ class SimulationDay():
                 settings=self.settings
             )
             self.connection_engine.create_connections()
-
-            self.interaction_engine = InteractionEngineCpp(
-                connections=self.connection_engine.connections,
-                settings=self.settings,
-                population=self.connection_engine.population
-            )
-
             self.interaction_engine = InteractionEngine(
                 connections=self.connection_engine.connections,
                 settings=self.settings,
                 population=self.connection_engine.population
             )
-            
-            self.interaction_engine.interact_all()
-
-            self.update_engine = UpdateEngine(
-                population=self.interaction_engine.population,
-                settings=self.settings
-            )
-            self.update_engine.update_all()
-
-            self.population._df = self.update_engine.population
         else:
             self.connection_engine = ConnectionEngineCpp(
                 population=self.population._df,
                 settings=self.settings
             )
             self.connection_engine.create_connections()
-
             self.interaction_engine = InteractionEngineCpp(
                 connections=self.connection_engine.connections,
                 settings=self.settings,
                 population=self.connection_engine.population
             )
 
-            self.update_engine = UpdateEngine(
-                population=self.interaction_engine.population,
-                settings=self.settings
-            )
-            self.update_engine.update_all()
-
-            self.population._df = self.update_engine.population
+        self.interaction_engine.interact_all()
+        self.update_engine = UpdateEngine(
+            population=self.interaction_engine.population,
+            settings=self.settings
+        )
+        self.update_engine.update_all()
+        self.population._df = self.update_engine.population
 
         logger.debug('- Day ran successfully.')
         logger.debug('- Saving final population.')
