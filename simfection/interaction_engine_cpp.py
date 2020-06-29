@@ -139,7 +139,7 @@ class InteractionEngineCpp2(InteractionEngineCpp):
             'agent': self.connections['agent'].tolist(),
             'connections': self.connections['connections'].tolist(),
             'num_connections': self.connections['num_connections'].tolist(),
-            'max_connections': bytearray(self.connections['max_connections'].tolist()),
+            'max_connections': self.connections['max_connections'].tolist(),
         }
 
         pathogen = {k.encode():v for k,v in self.pathogen.items()}
