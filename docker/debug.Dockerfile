@@ -16,4 +16,5 @@ RUN git clone https://github.com/simfection/simfection.git
 
 RUN cd simfection && \
     git checkout $COMMIT && \
+    git branch && \
     python setup.py install
