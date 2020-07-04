@@ -15,6 +15,7 @@ RUN pip uninstall notebook -y && \
 RUN git clone https://github.com/simfection/simfection.git
 
 RUN cd simfection && \
+    echo ${COMMIT} && \
     git checkout ${COMMIT} && \
     git branch && \
     python setup.py install
