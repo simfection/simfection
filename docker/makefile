@@ -11,8 +11,6 @@ devdocker:
 
 pushdocker:
 	docker push simfection/simfection:$(COMMIT)
-
-	OMMIT := $(shell git log -1 --format=%h)
 	#GITHUB_PAT_ = $(shell echo ${GITHUB_PAT})
 
 debugdocker:
