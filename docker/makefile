@@ -1,4 +1,4 @@
-COMMIT := $(shell git log -1 --format=%h)
+COMMIT = $(shell git log -1 --format=%h)
 
 docker:
 	docker build . -t \
