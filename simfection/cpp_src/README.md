@@ -1,12 +1,7 @@
-Note to self for writing the Cython .pyx and .pyd files later:
-
-Check out the following for ideas on using std::pair in Cython:
-http://tillahoffmann.github.io/2016/04/18/Cpp-containers-in-cython.html
-
 # Building the Network library
-This Cython directory contains the code to build the connections list generator defined in the C++ files: 
-connections.cpp
-connections.h
+This directory contains the code to build the connections list generator defined in the C++ files: 
+simfection_cpp.cpp
+simfection_cpp.h
 
 The C++ API is exposed in Cython according to the files:
 network.pxd (Cython header-esque file)
@@ -18,6 +13,7 @@ $ python3 setup.py build_ext --inplace
 
 You'll see a good number of warnings which you can ignore for now, and finally you should see the following generated:
 network.cpython-37m-darwin.so
+or some similar .so file depending on your OS. 
 
 This file will be needed to allow importing of the C++ code. 
 

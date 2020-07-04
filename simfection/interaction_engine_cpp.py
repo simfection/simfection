@@ -46,7 +46,7 @@ class InteractionEngineCpp(InteractionEngine):
     def _init_interactions(self):
         # Initialize the network.PyInteractions object
         # For a look at the API, checkout the network.pyx file in /cpp_src/cython
-        self.interactions = network.PyInteractions()
+        interactions = network.PyInteractions()
 
         # Get all the population information required for running PyInteractions
         pop_agent = self.population['agent'].tolist()
@@ -60,7 +60,7 @@ class InteractionEngineCpp(InteractionEngine):
         pop_immunity = self.population['immunity'].tolist()
 
         # Set the Population in the PyInteractions object
-        self.interactions.set_population(pop_agent,
+        interactions.set_population(pop_agent,
                                     pop_state,
                                     pop_infected_by,
                                     pop_days_infected,
@@ -73,7 +73,7 @@ class InteractionEngineCpp(InteractionEngine):
         conn_max_connections = self.connections['max_connections'].tolist()
 
         # Set the Connections in the PyInteractions object
-        self.interactions.set_connections(conn_agent,
+        interactions.set_connections(conn_agent,
                                      conn_connections,
                                      conn_num_connections,
                                      conn_max_connections)
@@ -81,17 +81,19 @@ class InteractionEngineCpp(InteractionEngine):
         # Set the Pathogen settings, first convert each value in pathogen
         # to unicode bytes for ingestion to interactions
         pathogen = {key.encode(): value for key, value in self.pathogen.items()}
-        self.interactions.set_pathogen_settings(pathogen)
+        interactions.set_pathogen_settings(pathogen)
+
+        return interactions
 
     def interact_all(self):
         verbose = self.verbose
         logger.debug('- Running InteractionEngine with C++ optimizations.')
 
-        self._init_interactions()
+        interactions = self._init_interactions()
 
         # Run the Interaction Engine functionality
-        self.interactions.interact_all()
-        results = self.interactions.get_population_df()
+        interactions.interact_all()
+        results = interactions.get_population_df()
         self.population = results
         if verbose:
             logger.debug(
