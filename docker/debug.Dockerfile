@@ -9,9 +9,11 @@ RUN pip uninstall notebook -y && \
     jupyter contrib nbextension install --user && \
     pip install jupyterthemes && \
     pip install nose && \
+    pip install invoke && \
     jt -t chesterish -tfs 11 -nfs 115 -cellw 95% -N
 
-RUN git clone https://github.com/simfection/simfection.git && \
-    cd simfection && \
+RUN git clone https://github.com/simfection/simfection.git
+
+RUN cd simfection && \
     git checkout $COMMIT && \
     python setup.py install
