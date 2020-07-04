@@ -1,5 +1,5 @@
 # Wrapping the connections list code 
-# distutils: sources = ./cpp_src/simfection_cpp.cpp
+# distutils: sources = ./simfection/cpp_src/simfection_cpp.cpp
 # distutils: language = c++
 import pandas as pd
 

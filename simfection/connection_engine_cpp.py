@@ -42,7 +42,7 @@ sys.setrecursionlimit(10**6)
 # network.comparchitecture.so file being in the same directory
 try:
     # If the network.so file does not exist, this will fail
-    import .network
+    import network
 except ModuleNotFoundError:
     # Compile the Network library from /cpp_src/
     cmd = "python3 setup.py build_ext --inplace"
@@ -50,7 +50,7 @@ except ModuleNotFoundError:
     if result.ok:
         logger.info("Network C++ library succesfully compiled.")
         try:
-            import .network
+            import network
         except ModuleNotFoundError:
             logger.info("Even after Network library was compiled, unable to import.")
             pass
