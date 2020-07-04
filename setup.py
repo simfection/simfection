@@ -1,5 +1,17 @@
 
 import setuptools
+from distutils.core import setup
+from distutils.extension import Extension
+from Cython.Build import cythonize
+
+ext_modules = [
+    Extension(
+        "network",
+        sources=["./simfection/cpp_src/network.pyx"],
+        language="c++",
+        extra_compile_args=['-std=c++11', '-O3'],
+    )
+]
 
 with open('README.md', 'r') as fh:
     long_description = fh.read()
@@ -33,4 +45,5 @@ setuptools.setup(
     },
     test_suite='nose.collector',
     tests_require=['nose'],
+    ext_modules=cythonize(ext_modules)
 )

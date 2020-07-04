@@ -10,3 +10,5 @@ notebooks/issues/.ipynb_checkpoints/
 simfection/__pycache__/
 
 simfection/testing/__pycache__/
+
+*.so
