@@ -39,7 +39,7 @@ logger = simfection_logger.get_logger()
 sys.setrecursionlimit(10**6)
 
 
-class ConnectionEngineCpp():
+class ConnectionEngine():
     """Creates a connections list for each agent in a population following
     the hand-shake protocol.
 
