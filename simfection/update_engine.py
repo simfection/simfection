@@ -3,7 +3,7 @@ import numpy as np
 import time
 # User defined imports
 from .connection_engine import ConnectionEngine
-from .interaction_engine import InteractionEngine, pathogen
+from .interaction_engine import InteractionEngine
 from .population_engine import PopulationEngine
 from .settings import SimfectionSettings
 from .logger import SimfectionLogger
