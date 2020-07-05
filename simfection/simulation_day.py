@@ -58,7 +58,7 @@ class SimulationDay():
             settings=self.settings
         )
         self.connection_engine.create_connections()
-        self.interaction_engine = InteractionEngineCpp(
+        self.interaction_engine = InteractionEngine(
             connections=self.connection_engine.connections,
             settings=self.settings,
             population=self.connection_engine.population
