@@ -5,7 +5,6 @@ import logging
 # User defined imports
 from .connection_engine import ConnectionEngine
 from .interaction_engine import InteractionEngine
-from .interaction_engine_cpp import InteractionEngineCpp
 from .population_engine import PopulationEngine
 from .update_engine import UpdateEngine
 from .settings import SimfectionSettings
