@@ -16,10 +16,9 @@ ext_modules = [
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
-requirements = [
-    'pandas==1.0.4',
-    'PyYAML>=5.0.0',
-]
+with open("requirements.txt") as f:
+    requirements = f.readlines()
+
 install_requires = [r.strip() for r in requirements]
 
 setuptools.setup(
