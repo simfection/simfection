@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+# User defined imports
 from .settings import SimfectionSettings
 from .logger import SimfectionLogger
 

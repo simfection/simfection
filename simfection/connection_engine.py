@@ -23,20 +23,15 @@ and randomly creates a hand-shake network of interactions within the population.
     )
     connection_engine.create_connections()
 """
-# import typing #TODO: (Grant) I'm not sure if this is
-# needed for typing.
 import time
 import sys
 import pandas as pd
 import numpy as np
+from invoke import run
+# User defined imports
+import network
 from .settings import SimfectionSettings
 from .logger import SimfectionLogger
-# the network library depends on the
-# network.cpython-37m-darwin.so file being in the same directory
-try:
-    import network
-except ModuleNotFoundError:
-    pass
 
 simfection_logger = SimfectionLogger(name=__name__)
 logger = simfection_logger.get_logger()
@@ -80,6 +75,7 @@ class ConnectionEngine():
         self.std = settings.get_setting('std')
         self.size = settings.get_setting('size')
         self.connections = None
+        self.cpp = settings.get_setting('cpp')
 
     def _max_connections(self,
                          std: int = None,
@@ -98,91 +94,42 @@ class ConnectionEngine():
 
         return choice
 
-    @staticmethod
-    def _available_to_connect(agent: str, connections: pd.DataFrame):
-        # Return IDs of people with connections less than num_connections
-        # Only drop agent if it returns from query
-        try:
-            return connections[
-                connections.num_connections < connections.max_connections
-            ].drop(agent).index
-        except KeyError:
-            return connections[
-                connections.num_connections < connections.max_connections
-            ].index
+    def _build_connection_list(self, connections):
+        # Use the wrapped C++ PyConnections object to generate a random network instead
+        if self.experiment:
+            _start = time.time()
+        # Run functions here
+        # Instantiate a PyConnections object
+        size = connections['agent'].size
+        net = network.PyConnections(size)
+        # Get the connection limits as a list to pass into function later
+        connections_max_list = connections['max_connections'].values.tolist()
+        # Generate the random network 2D list to convert to DataFrame form later
+        start_gen_random_network = time.time()
+        random_network = net.gen_random_network(connections_max_list)
+        end_gen_random_network = time.time()
+        runtime_gen_random_network = end_gen_random_network - start_gen_random_network
+        logger.debug(f'- Random network generated in {runtime_gen_random_network} seconds.')
+        # Update the connections DataFrame using the 2D list
+        new_connections = pd.DataFrame({'connections': random_network})
+        connections.update(new_connections)
+        # Update the num_connections part of the connections DataFrame
+        # TODO(aogle): update the implementation so it doesn't require magic numbers
+        for i in range(0, connections['connections'].size):
+            connections.iloc[i, 2] = len(connections.iloc[i, 1])
+        if self.experiment:
+            runtime_available = time.time() - _start
+            runtime_choose = runtime_available
+            return connections, runtime_available, runtime_choose
+        return connections
 
-    def _build_connection_list(self, agent, connections, use_cpp=False):
-
-        if(use_cpp):
-            # Use the wrapped C++ PyConnections object to generate a random network instead
-            if self.experiment:
-                _start = time.time()
-            # Run functions here
-            # Instantiate a PyConnections object
-            size = connections['agent'].size
-            net = network.PyConnections(size)
-            # Get the connection limits as a list to pass into function later
-            connections_max_list = connections['max_connections'].values.tolist()
-            # Generate the random network 2D list to convert to DataFrame form later
-            start_gen_random_network = time.time()
-            random_network = net.gen_random_network(connections_max_list)
-            end_gen_random_network = time.time()
-            runtime_gen_random_network = end_gen_random_network - start_gen_random_network
-            logger.debug(f'- Random network generated in {runtime_gen_random_network} seconds.')
-            # Update the connections DataFrame using the 2D list
-            new_connections = pd.DataFrame({'connections': random_network})
-            connections.update(new_connections)
-            # Update the num_connections part of the connections DataFrame
-            # TODO(aogle): update the implementation so it doesn't require magic numbers
-            for i in range(0, connections['connections'].size):
-                connections.iloc[i, 2] = len(connections.iloc[i, 1])
-            if self.experiment:
-                runtime_available = time.time() - _start
-                runtime_choose = runtime_available
-                return connections, runtime_available, runtime_choose
-            return connections
-        else:
-            # Get other agents available to connect
-            if self.experiment:
-                _start = time.time()
-            available = self._available_to_connect(agent, connections)
-            if self.experiment:
-                runtime_available = time.time() - _start
-
-            # Randomly choose connection
-            if self.experiment:
-                _start = time.time()
-            if len(available) > 0:
-                connection = np.random.choice(available)
-                # Make connection
-                connections.iloc[connection].connections.append(agent)
-                connections.iloc[agent].connections.append(connection)
-
-                # Update number of connections
-                connections.iloc[[agent, connection], 2] += 1
-
-                # Iterate if necessary
-                cont = (
-                    connections.num_connections[agent] < connections.max_connections[agent]
-                )
-                if cont:
-                    self._build_connection_list(agent, connections)
-            if self.experiment:
-                runtime_choose = time.time() - _start
-                return connections, runtime_available, runtime_choose
-            return connections
-
-    def create_connections(self, use_cpp=False):
+    def create_connections(self):
         """Creates connection list for each agent.
 
         A connections DataFrame is created and returned using the agents in the
         PopulationEngine instance self attribute. This method and return object
         spec are required inputs for the next step,which is the interaction
         engine.
-
-        Args:
-            ALEX: I don't know if I should put arguments here, because the
-            method uses self attributes. Thoughts?
 
         Returns:
             A pandas DataFrame representing the interaction network for a
@@ -205,14 +152,9 @@ class ConnectionEngine():
                 2         [5]                1                1
                 3      [1, 4]                2                1
                 4      [3, 8]                2                1
-
-
-        Raises:
-            #TODO
         """
         std = self.std
         size = self.size
-        verbose = self.verbose
         if self.experiment:
             logger.debug('- Entering experiment mode.')
 
@@ -236,42 +178,22 @@ class ConnectionEngine():
                 'available': [],
                 'choose': []
             }
-        if(use_cpp):
-            # Use the cpp optimization instead
-            if self.experiment:
-                connections, runtime_available, runtime_choose = self._build_connection_list(
-                    0,  # this parameter doesn't matter for cpp
-                    connections,
-                    use_cpp
-                )
-                runtime['available'].append(runtime_available)
-                runtime['choose'].append(runtime_choose)
-            else:
-                self._build_connection_list(0, connections, use_cpp)
-            self.connections = connections
-            logger.debug('- All connections made successfully with C++ optimization.')
-            if self.experiment:
-                return connections, runtime
-            return None
-        else:
-            for _per in connections.index:
 
-                if self.experiment:
-                    connections, runtime_available, runtime_choose = self._build_connection_list(
-                        _per,
-                        connections,
-                    )
-                    runtime['available'].append(runtime_available)
-                    runtime['choose'].append(runtime_choose)
-                else:
-                    self._build_connection_list(_per, connections)
-            self.connections = connections
-            logger.debug('- All connections made successfully.')
-            if self.experiment:
-                return connections, runtime
-            return None
+        if self.experiment:
+            connections, runtime_available, runtime_choose = self._build_connection_list(
+                connections,
+            )
+            runtime['available'].append(runtime_available)
+            runtime['choose'].append(runtime_choose)
+        else:
+            self._build_connection_list(connections)
+        self.connections = connections
+        logger.debug('- All connections made successfully with C++ optimization.')
+        if self.experiment:
+            return connections, runtime
+        return None
 
 
 if __name__ == '__main__':
-    print("Hi, I'm the Connection Engine. I'm not meant to be run directly.")
-    print('To use me, please import ConnectionEngine in your script.')
+    print("Hi, I'm the ConnectionEngine++. I'm not meant to be run directly.")
+    print('To use me, please import ConnectionEngineCpp in your script.')

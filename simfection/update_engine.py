@@ -1,12 +1,12 @@
-from .connection_engine import ConnectionEngine
-from .interaction_engine import InteractionEngine, pathogen
-from .population_engine import PopulationEngine
-from .settings import SimfectionSettings
-from .logger import SimfectionLogger
-
 import pandas as pd
 import numpy as np
 import time
+# User defined imports
+from .connection_engine import ConnectionEngine
+from .interaction_engine import InteractionEngine
+from .population_engine import PopulationEngine
+from .settings import SimfectionSettings
+from .logger import SimfectionLogger
 
 simfection_logger = SimfectionLogger(name=__name__)
 logger = simfection_logger.get_logger()

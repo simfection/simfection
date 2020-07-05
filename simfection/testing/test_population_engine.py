@@ -5,6 +5,7 @@ sys.path.append('../simfection')
 import unittest
 import numpy as np
 from invoke import run
+# User defined imports
 from simfection.settings import SimfectionSettings
 from simfection.population_engine import PopulationEngine
 
