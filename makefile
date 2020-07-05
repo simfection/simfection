@@ -14,6 +14,6 @@ pushdocker:
 	#GITHUB_PAT_ = $(shell echo ${GITHUB_PAT})
 
 debugdocker:
-	docker build -f debug.Dockerfile . -t \
+	docker build -f docker/debug.DockerFile . -t \
 	simfection/simfection_debug:$(COMMIT) \
 	--build-arg COMMIT=$(COMMIT)
